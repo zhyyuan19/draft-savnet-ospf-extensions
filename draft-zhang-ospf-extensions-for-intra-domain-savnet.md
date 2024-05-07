@@ -66,7 +66,7 @@ TODO Abstract
 TODO Introduction
 
 ~~~~~~~~~~ aasvg
-{::include a.ascii-art}
+{::include intra_topo.ascii-art}
 ~~~~~~~~~~
 {: #intra_topo title="An example of intra-domain network."}
 
