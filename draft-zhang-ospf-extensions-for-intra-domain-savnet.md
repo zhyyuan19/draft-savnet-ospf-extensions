@@ -9,19 +9,19 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: "Routing"
+workgroup: "Open Shortest Path First IGP"
 keyword:
  - next generation
  - unicorn
  - sparkling distributed ledger
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
+  group: "Open Shortest Path First IGP"
+  type: "Working Group"
+  mail: "ospf@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/ospf/"
+  github: "wsxyer/draft-savnet-ospf-extensions"
+  latest: "https://wsxyer.github.io/draft-savnet-ospf-extensions/draft-zhang-ospf-extensions-for-intra-domain-savnet.html"
 
 author:
  -
