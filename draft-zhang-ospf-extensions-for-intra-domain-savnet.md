@@ -23,7 +23,7 @@ title: "TODO - Your title"
 abbrev: "TODO - Abbreviation"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
+docname: draft-zhang-ospf-extensions-for-intra-domain-savnet-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
@@ -65,6 +65,10 @@ TODO Abstract
 
 TODO Introduction
 
+~~~~~~~~~~ aasvg
+{::include a.ascii-art}
+~~~~~~~~~~
+{: #intra_topo title="An example of intra-domain network."}
 
 # Conventions and Definitions
 
