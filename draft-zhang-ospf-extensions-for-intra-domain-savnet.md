@@ -19,8 +19,8 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "Extensions to OSPF for Intra-domain Source Address Validation (SAVNET)"
+abbrev: "Intra-domain SAVNET OSPF Extensions"
 category: info
 
 docname: draft-zhang-ospf-extensions-for-intra-domain-savnet-latest
