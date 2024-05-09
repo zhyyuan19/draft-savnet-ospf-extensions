@@ -122,11 +122,19 @@ Improper Permit
 # Solution 
 
 ## Overview {#overview-sec}
+<<<<<<< HEAD
 In networks utilizing either OSPFv2 or OSPFv3 protocols, routers positioned at different locations within the network should undertake varying responsibilities in source address validation, collectively contributing to effective outbound and inbound traffic validation. Different validation modes as described in {{sav-table}} can be used in different scenarios as explained below. 
 
 - **Edge Source Address Validation (Edge SAV)**
 
   Edge routers connected directly to stub networks are pivotal as starting points for traffic entering the intra-domain network. Performing SAV at these points ensures the legitimacy of outbound traffic’s source addresses right at the entry. If an edge router is aware of all prefixes of the connected stub network and is capable of implementing SAV, these prefixes should be added to an allowlist at the interface connected to the stub network. Packets originating from the stub network with source addresses matching the allowlist should be normally forwarded, while others should be blocked, thus preventing spoofed source address packets from entering the domain at their origin.
+=======
+In networks utilizing either OSPFv2 or OSPFv3 protocols, routers positioned at different locations within the network should undertake varying responsibilities in source address validation, collectively contributing to effective outbound and inbound traffic validation.
+
+- **Edge Source Address Validation (Edge SAV)**
+
+  Edge routers connected directly to stub networks are pivotal as starting points for traffic entering the intra-domain network. Performing SAV at these points ensures the legitimacy of outbound traffic’s source addresses right at the entry. If an edge router is aware of all prefixes of the connected stub network and is capable of implementing SAV, these prefixes should be whitelisted at the interface connected to the stub network. Packets originating from the stub network and matching the whitelist should be normally forwarded, while others should be blocked, thus preventing spoofed source address packets from entering the domain at their origin.
+>>>>>>> 13c6fe4d93adb6ef794b81dc747e9157734dd37c
 
 - **Transit Source Address Validation (Transit SAV)**
   
@@ -134,6 +142,7 @@ In networks utilizing either OSPFv2 or OSPFv3 protocols, routers positioned at d
 
 - **Area Border Source Address Validation (Area Border SAV)**
 
+<<<<<<< HEAD
   In large networks utilizing the OSPF protocol, an Autonomous System (AS) may be divided into multiple areas. To prevent routing loops in multi-area scenarios, traffic between non-backbone areas is typically routed through the backbone area, rather than crossing a third non-backbone area. Packets received at the Area Border Router (ABR) interfaces connected to a specific area should only have source addresses belonging to that area and not from other areas. It is practical for an ABR to add the prefixes advertised to that area in summary LSAs to a SAV blocklist at the interfaces connected to that specific area. This prevents inter-area source address spoofing by blocking packets whose source addresses matches this blocklist.
 
 - **AS Border Source Address Validation (AS Border SAV)**
@@ -149,6 +158,25 @@ A SAV message should at least include the following fields:
 {:vspace}
 Message Type (MT)
 : Distinguishes SAV messages based on the kind of routing information used to generate the message. 'S' means the message is generated based on SPT. 'P' means the message is generated based on PBR rules.
+=======
+  In large networks utilizing the OSPF protocol, an Autonomous System (AS) may be divided into multiple areas. To prevent routing loops in multi-area scenarios, traffic between non-backbone areas is typically routed through the backbone area, rather than crossing a third non-backbone area. Packets received at the Area Border Router (ABR) interfaces connected to a specific area should only have source addresses belonging to that area and not from other areas. It is practical for an ABR to add the prefixes advertised to that area in summary LSAs to a SAV blacklist at the interfaces connected to that specific area. This prevents inter-area source address spoofing by blocking packets whose source addresses are on this blacklist.
+
+- **AS Border Source Address Validation (AS Border SAV)**
+
+  AS Border Routers (ASBRs) are gateways through which external traffic enters the domain. ASBRs can discern the prefix of their own AS through router-LSAs and summary-LSAs. By adding these prefixes to a blacklist at interfaces connecting to other ASs, packets from other ASs with source addresses on this blacklist can be blocked, thereby preventing spoofed traffic from entering the domain.
+
+For Edge SAV, Area Border SAV, and AS Border SAV, routers may establish corresponding SAV rules either manually or based on the local LSDB. For Transit SAV, routers must be aware of the valid incoming interfaces for a given source prefix in order to establish SAV rules. Packets with source addresses matching this source prefix and arriving from valid interfaces are normally forwarded. If they arrive from other interfaces, they should be processed according to predefined security policies, which may include actions like packet dropping or rate limiting. 
+
+In OSPF networks, packets are typically forwarded along the paths specified by the Shortest Path Tree (SPT). However, if a router has enabled Policy-Based Routing (PBR), the packets will be preferentially forwarded to the next hop as designated by the PBR rules. Transit routers must be aware of all valid incoming interfaces for a source prefix to avoid improper blocking of packets with legitimate source addresses. An effective approach is for the router owning that source prefix to proactively send SAV messages to these transit routers. The messages should inform the routers about which interfaces packets matching that source prefix will reach along the actual forwarding paths, including those determined by the routing protocol and those specified by PBR. To accomplish this, routers can generate a SAV message for a protected source prefix, specifying the neighboring router to receive the message and the destination routers to which the message will be ultimately advertised. The SAV message propagates along the actual forwarding path of the source prefix. Routers receiving a SAV message through an interface recognize that interface as valid for the source prefix conveyed in the message. Based on the received SAV messages, routers can establish a prefix-based interface list (see {{sav-table}}) for data-plane SAV filtering. 
+
+A SAV message should at least include the following fields.
+
+{:vspace}
+Message Type (MT)
+: Distinguishes SAV messages based on the kind of routing information used to generate the message.
+: S - the message is generated based on SPT
+: P - the message is generated based on PBR rules
+>>>>>>> 13c6fe4d93adb6ef794b81dc747e9157734dd37c
 
 Source Router ID (SR)
 : The identifier of the router that generated the message.
@@ -178,12 +206,21 @@ Specifically, the SPT of R1 includes leaf nodes R3, R5, and R6, with R3 directly
                     +----+        +----+
              int.2.1| R2 +--------+ R4 |
                    /+----+\      /+--+-+\
+<<<<<<< HEAD
                   /        \    /        \
                  /          \  /          \int.6.1
           +----+/            \/            \+----+
           | R1 |             /\             | R6 |
          /+----+\           /  \           /+----+
   ------/        \         /    \int.5.2  /int.6.2
+=======
+                  /        \    /    |   \
+                 /          \  /     |    \int.6.1
+          +----+/            \/      |     \+----+
+          | R1 |             /\      |      | R6 |
+         /+----+\           /  \ int.|     /+----+
+  ------/        \         /    \5.2 |    /
+>>>>>>> 13c6fe4d93adb6ef794b81dc747e9157734dd37c
  (subnet)         \ +----+/      \+--+-+ /
   ------           \| R3 +--------+ R5 |/
 10.1.0.0/16         +----+        +----+
@@ -215,9 +252,17 @@ Specifically, the SPT of R1 includes leaf nodes R3, R5, and R6, with R3 directly
 
 SAV messages are propagated within an area. SAV messages generated by different routers carry different source prefix information based on their role.
 
+<<<<<<< HEAD
 If a router is connected to a stub network, it should generate SAV messages to protect the prefixes of this stub network from being spoofed. To reduce communication overhead, the router can send a SAV message with the SP field set to a specific value. Routers receiving a message with SP set to this specific value use the prefixes of SR's stub network stored in the LSDB as source prefixes to be validated. They are included in the Router-LSA advertised by SR with link type "stub".
 
 If a router is an ABR or ASBR, it can also generate SAV messages to protect the prefixes outside the area from being spoofed. For an ABR, the source prefix announced in a SAV message can be prefixes contained in summary-LSAs advertised within the area and prefixes contained in AS-external-LSAs received from other areas. For an ASBR, the source prefix announced in a SAV message can be prefixes contained in AS-external-LSAs advertised within the area. To reduce communication overhead, an ABR or ASBR can send a SAV message with the SP field set to a specific value. Routers receiving a message with SP set to a specific value use prefixes included in the summary-LSAs advertised by this ABR or prefixes included in the AS-external-LSAs advertised by this ASBR as source prefixes to be validated. 
+=======
+- **Internal Router**: The source prefix should be the prefixes of the stub networks to which the router is connected. To reduce communication overhead, the SP field can be set to a default value. Routers receiving a message with SP set to the default value use the prefixes of SR's stub network stored in the LSDB as source prefixes to be validated. They are included in the Router-LSA advertised by SR with link type "stub".
+
+- **ABR**: The source prefix can be prefixes contained in summary-LSAs sent within the same area and prefixes contained in AS-external-LSAs received from other areas. For stub areas, an ABR issues a Type 3 summary-LSA with the prefix 0.0.0.0/0 as a default route. Consequently, a SAV message with SP set to 0.0.0.0/0 is sent by the ABR. Routers receiving the message establish a default SAV rule. If a packet’s source address does not match any other SAV rule, the default SAV rule is used to validate the legitimacy of the packet.
+
+- **ASBR**: The source prefix can be prefixes announced in AS-external-LSAs sent within the domain.
+>>>>>>> 13c6fe4d93adb6ef794b81dc747e9157734dd37c
 
 ## SAV Message Propagation considering Policy-based Routing {#pbr-sec}  
 Policy-based routing (PBR) is a widely supported feature on modern routers. It enables network administrators to make routing decisions based on policies that reflect specific network requirements, rather than solely depending on routing tables generated by traditional routing protocols. This capability allows for finer control over traffic flows, facilitating decision-making based on criteria such as source and destination addresses, specific types of traffic, or even application data. By establishing PBR rules, administrators can direct different types of traffic along designated paths, thus addressing specific security or Quality of Service (QoS) needs effectively.
@@ -226,7 +271,11 @@ In networks where routers are configured with PBR, it is crucial to propagate SA
 
 Take {{intra_topo}} as an example. Assume Router R1 has a local PBR rule defined as <10.1.1.0/24, 10.5.0.0/16, R3>. This rule redirects traffic from the source IP addresses within 10.1.1.0/24 heading towards the stub network connected to R5, to go via R3 instead. R1 should generate a SAV message based on this rule and propagate this message along link R1-R3 and R3-R5. This action designates interfaces int.3.1 at R3 and int.5.1 at R5 as vaid incoming interfaces for the prefix 10.1.1.0/24.
 
+<<<<<<< HEAD
 Similarly, assume Router R2 has a PBR rule which redirects all traffic on port 80 going to the subnet 10.6.0.0/16 of R6 towards R5. Besides forwarding the SAV message originated from R1 to R6 along the SPT, R2 should also send the SAV message through R5 to reach R6 base on this PBR rule. This ensures that int.5.2 at R5 and int.6.2 at R6 are recognized as valid incoming interfaces for the source prefixes of R1.
+=======
+Similarly, assume Router R4 has a PBR rule which redirects all traffic on port 80 going to the subnet 10.6.0.0/16 of R6 towards R5. Besides forwarding the SAV message originated from R1 directly to R6 along the SPT, R4 should also send the SAV message through R5 to reach R6 base on this PBR rule. This ensures that int.5.3 at R5 and int.6.2 at R6 are also recognized as valid incoming interfaces for the source prefixes of R1.
+>>>>>>> 13c6fe4d93adb6ef794b81dc747e9157734dd37c
 
 ### SAV Message Generation
 When a router, such as Router R1, is configured with PBR rules that direct specific types of traffic to a neighbor (e.g., R2), it is essential for R1 to generate SAV messages based on these PBR rules and send them to R2. This enables R2 to permit the corresponding traffic through and to continue propagating the SAV information to other relevant routers within the domain. The fields for SAV messages generated based on PBR rules are set as follows:
@@ -324,7 +373,11 @@ Length
 
 Message Type
 : 0 - the SAV message is based on SPT
+<<<<<<< HEAD
 : 1 - the SAV message is based on PBR
+=======
+  1 - the SAV message is based on PBR
+>>>>>>> 13c6fe4d93adb6ef794b81dc747e9157734dd37c
 
 Reserved
 : SHOULD be set to 0 on transmission and MUST be ignored on reception.
@@ -391,7 +444,11 @@ Length
 
 Message Type
 : 0 - the SAV message is based on SPT
+<<<<<<< HEAD
 : 1 - the SAV message is based on PBR
+=======
+  1 - the SAV message is based on PBR
+>>>>>>> 13c6fe4d93adb6ef794b81dc747e9157734dd37c
 
 Reserved
 : SHOULD be set to 0 on transmission and MUST be ignored on reception.
