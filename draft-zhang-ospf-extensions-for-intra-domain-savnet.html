@@ -5,14 +5,16 @@
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
 <title>Extensions to OSPF for Intra-domain Source Address Validation (SAVNET)</title>
-<meta content="wsxyer" name="author">
+<meta content="Yuanyuan Zhang" name="author">
+<meta content="Mingwei Xu" name="author">
+<meta content="Dan Li" name="author">
+<meta content="Yuliang Wang" name="author">
 <meta content="
-       TODO Abstract 
+       This document proposes a comprehensive intra-domain Source Address Validation (SAV) solution to deal with different source address spoofing scenarios. It can be applied to networks running OSPFv2 and OSPFv3. The Source Prefix Validation Sub-TLV is defined to support automatic SAV-specific information exchanging between area-local routers, which helps routers generate accurate SAV rules to verify the validity of data packets. 
     " name="description">
 <meta content="xml2rfc 3.21.0" name="generator">
-<meta content="next generation" name="keyword">
-<meta content="unicorn" name="keyword">
-<meta content="sparkling distributed ledger" name="keyword">
+<meta content="source address validation" name="keyword">
+<meta content="OSPF" name="keyword">
 <meta content="draft-zhang-ospf-extensions-for-intra-domain-savnet-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.21.0
@@ -1030,8 +1032,8 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <td class="right">May 2024</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">wsxyer</td>
-<td class="center">Expires 9 November 2024</td>
+<td class="left">Zhang, et al.</td>
+<td class="center">Expires 11 November 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1039,22 +1041,34 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <div id="internal-metadata" class="document-information">
 <dl id="identifiers">
 <dt class="label-workgroup">Workgroup:</dt>
-<dd class="workgroup">Open Shortest Path First IGP</dd>
+<dd class="workgroup">SAVNET</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
 <dd class="internet-draft">draft-zhang-ospf-extensions-for-intra-domain-savnet-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-05-08" class="published">8 May 2024</time>
+<time datetime="2024-05-10" class="published">10 May 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-11-09">9 November 2024</time></dd>
-<dt class="label-authors">Author:</dt>
+<dd class="expires"><time datetime="2024-11-11">11 November 2024</time></dd>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
-      <div class="author-name">wsxyer</div>
-<div class="org">Your Organization Here</div>
+      <div class="author-name">Y. Zhang</div>
+<div class="org">Zhongguancun Laboratory</div>
+</div>
+<div class="author">
+      <div class="author-name">M. Xu</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">D. Li</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">Y. Wang</div>
+<div class="org">Quan Cheng Laboratory</div>
 </div>
 </dd>
 </dl>
@@ -1062,7 +1076,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Extensions to OSPF for Intra-domain Source Address Validation (SAVNET)</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">TODO Abstract<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document proposes a comprehensive intra-domain Source Address Validation (SAV) solution to deal with different source address spoofing scenarios. It can be applied to networks running OSPFv2 and OSPFv3. The Source Prefix Validation Sub-TLV is defined to support automatic SAV-specific information exchanging between area-local routers, which helps routers generate accurate SAV rules to verify the validity of data packets.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1074,9 +1088,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
         Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-zhang-ospf-extensions-for-intra-domain-savnet/">https://datatracker.ietf.org/doc/draft-zhang-ospf-extensions-for-intra-domain-savnet/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
-        Open Shortest Path First IGP Working Group mailing list (<span><a href="mailto:ospf@ietf.org">mailto:ospf@ietf.org</a></span>),
-        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/ospf/">https://mailarchive.ietf.org/arch/browse/ospf/</a></span>.
-        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/ospf/">https://www.ietf.org/mailman/listinfo/ospf/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+        SAVNET Working Group mailing list (<span><a href="mailto:savnet@ietf.org">mailto:savnet@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/savnet/">https://mailarchive.ietf.org/arch/browse/savnet/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/savnet/">https://www.ietf.org/mailman/listinfo/savnet/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
         <span><a href="https://github.com/wsxyer/draft-savnet-ospf-extensions">https://github.com/wsxyer/draft-savnet-ospf-extensions</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
@@ -1099,7 +1113,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 November 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 November 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1130,24 +1144,87 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-requirements-language" class="internal xref">Requirements Language</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-solution" class="internal xref">Solution</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-sav-message-propagation-bas" class="internal xref">SAV Message Propagation based on SPT</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-sav-message-propagation-con" class="internal xref">SAV Message Propagation considering Policy-based Routing</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.1">
+                    <p id="section-toc.1-1.3.2.3.2.1.1"><a href="#section-3.3.1" class="auto internal xref">3.3.1</a>.  <a href="#name-sav-message-generation" class="internal xref">SAV Message Generation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.2">
+                    <p id="section-toc.1-1.3.2.3.2.2.1"><a href="#section-3.3.2" class="auto internal xref">3.3.2</a>.  <a href="#name-sav-message-forwarding" class="internal xref">SAV Message Forwarding</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-protocol-extension" class="internal xref">Protocol Extension</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-extensions-to-ospfv2-for-sa" class="internal xref">Extensions to OSPFv2 for SAV Message Propagation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-extensions-to-ospfv3-for-sa" class="internal xref">Extensions to OSPFv3 for SAV Message Propagation</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-use-cases" class="internal xref">Use Cases</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-automatic-update-considerat" class="internal xref">Automatic Update Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-incremental-partial-deploym" class="internal xref">Incremental/Partial Deployment Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-ospfv2" class="internal xref">OSPFv2</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-ospfv3" class="internal xref">OSPFv3</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1158,120 +1235,990 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">TODO Introduction<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">In the realm of network security, the authenticity of packet sources stands as a fundamental pillar. Source address spoofing, wherein an attacker deceives a network by masquerading as a legitimate user, poses severe risks including but not limited to identity theft, unauthorized network access, and the facilitation of denial-of-service (DoS) attacks. Such activities compromise the integrity of data, disrupt service operations, and erode the trust in network communications.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Implementing robust source address validation (SAV) mechanisms within domains is crucial for mitigating these threats. Representative existing solutions for intra-domain source address validation include ACL-based ingress filtering<span>[<a href="#RFC2827" class="cite xref">RFC2827</a>]</span><span>[<a href="#RFC3704" class="cite xref">RFC3704</a>]</span>, Strict uRPF<span>[<a href="#RFC3704" class="cite xref">RFC3704</a>]</span>, etc. However, as analyzed in <span>[<a href="#intra-domain-ps" class="cite xref">intra-domain-ps</a>]</span>, these mechanisms often suffer from high operational overhead and limitations in their accuracy, leading to potential mismanagement and false positives in dynamic network environments.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">To address these shortcomings, the Intra-domain Source Address Validation (SAVNET) Architecture<span>[<a href="#intra-domain-arch" class="cite xref">intra-domain-arch</a>]</span> proposes a novel framework that facilitates the exchange of SAV-specific information among routers within a domain. This architecture is designed to bridge the gap left by existing solutions, enabling the automatic creation of sav rules and enhancing the accuracy of source address validation. By leveraging timely and dedicated information specialized for SAV, this approach aims to reduce the incidence of both false positives and negatives associated with source address validation.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document follows the Intra-domain SAVNET architecture to propose a specific implementation that extends the OSPF protocol to enable the exchange of SAV-specific information within the domain. The proposed solution equips routers with the capability to recognize all the legitimate ingress interfaces a source prefix might reach along its actual forwarding paths—paths not only defined by routing protocols but also specified by network administrators based on policies. Such an approach enables routers to use the accurate information they possess to prevent both the erroneous blocking of legitimate traffic and the spread of spoofed traffic within a network domain.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">The scheme proposed herein is applicable to both single-area and multi-area scenarios within a domain. In multi-area scenarios, the SAV-specific information generated by routers is propagated only within their respective areas, thus reducing communication overhead. Implementing or partially implementing this scheme within a domain will help achieve the following objectives:<a href="#section-1-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-6.1">
+          <p id="section-1-6.1.1">Outbound traffic validation: prevent packets with spoofed source addresses generated by the stub networks from entering or moving within the domain.<a href="#section-1-6.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-6.2">
+          <p id="section-1-6.2.1">Inbound traffic validation: prevent packets spoofing the domain’s own source addresses originating from other domains from entering the domain.<a href="#section-1-6.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<div id="requirements-language">
+<section id="section-1.1">
+        <h3 id="name-requirements-language">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-requirements-language" class="section-name selfRef">Requirements Language</a>
+        </h3>
+<p id="section-1.1-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="terminology">
+<section id="section-2">
+      <h2 id="name-terminology">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+      </h2>
+<span class="break"></span><dl class="dlNewline" id="section-2-1">
+        <dt id="section-2-1.1">SAV Rule</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.2">
+          <p id="section-2-1.2.1">The rule that indicates the valid incoming interfaces for a specific source prefix or source IP address.<a href="#section-2-1.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.3">SAV Table</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.4">
+          <p id="section-2-1.4.1">The table or data structure that implements the SAV rules and is used for source address validation on the data plane.<a href="#section-2-1.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.5">SAV-specific Information</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.6">
+          <p id="section-2-1.6.1">The information specialized for SAV rule generation, which is exchanged among routers.<a href="#section-2-1.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.7">Policy-based Routing</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.8">
+          <p id="section-2-1.8.1">Routing based on the policies defined by the network administrator.<a href="#section-2-1.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.9">Improper Block</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.10">
+          <p id="section-2-1.10.1">The validation results that the packets with legitimate source addresses are blocked improperly due to inaccurate SAV rules.<a href="#section-2-1.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.11">Improper Permit</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.12">
+          <p id="section-2-1.12.1">The validation results that the packets with spoofed source addresses are permitted improperly due to inaccurate SAV rules.<a href="#section-2-1.12.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="solution">
+<section id="section-3">
+      <h2 id="name-solution">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-solution" class="section-name selfRef">Solution</a>
+      </h2>
+<div id="overview-sec">
+<section id="section-3.1">
+        <h3 id="name-overview">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
+        </h3>
+<p id="section-3.1-1">In networks utilizing either OSPFv2 or OSPFv3 protocols, routers positioned at different locations within the network should undertake varying responsibilities in source address validation, collectively contributing to effective outbound and inbound traffic validation. Different validation modes as described in <span>[<a href="#sav-table" class="cite xref">sav-table</a>]</span> can be used in different scenarios as explained below.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1"><strong>Edge Source Address Validation (Edge SAV)</strong><a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.1.2">
+Edge routers connected directly to stub networks are pivotal as starting points for traffic entering the intra-domain network. Performing SAV at these points ensures the legitimacy of outbound traffic’s source addresses right at the entry. If an edge router is aware of all prefixes of the connected stub network and is capable of implementing SAV, these prefixes should be added to an allowlist at the interface connected to the stub network. Packets originating from the stub network with source addresses matching the allowlist should be normally forwarded, while others should be blocked, thus preventing spoofed source address packets from entering the domain at their origin.<a href="#section-3.1-2.1.2" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1"><strong>Transit Source Address Validation (Transit SAV)</strong><a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.2.2">
+Ensuring that all edge routers support Edge SAV might be challenging in a network environment composed of multi-vendor devices, due to differences in versions and capabilities. If not all edge routers can achieve accurate Edge SAV, packets with spoofed source addresses from stub networks might still appear within the domain. Under such circumstances, transit routers, responsible for forwarding packets, can perform source address validation during packet transit, further ensuring the authenticity of traffic forwarded in the domain.<a href="#section-3.1-2.2.2" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1"><strong>Area Border Source Address Validation (Area Border SAV)</strong><a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.3.2">
+In large networks utilizing the OSPF protocol, an Autonomous System (AS) may be divided into multiple areas. To prevent routing loops in multi-area scenarios, traffic between non-backbone areas is typically routed through the backbone area, rather than crossing a third non-backbone area. Packets received at the Area Border Router (ABR) interfaces connected to a specific area should only have source addresses belonging to that area and not from other areas. It is practical for an ABR to add the prefixes advertised to that area in summary LSAs to a SAV blocklist at the interfaces connected to that specific area. This prevents inter-area source address spoofing by blocking packets whose source addresses matches this blocklist.<a href="#section-3.1-2.3.2" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.4">
+            <p id="section-3.1-2.4.1"><strong>AS Border Source Address Validation (AS Border SAV)</strong><a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2">
+AS Border Routers (ASBRs) are gateways through which external traffic enters the domain. ASBRs can discern the prefix of their own AS through router-LSAs and summary-LSAs. By adding these prefixes to a blocklist at interfaces connecting to other ASs, packets from other ASs with source addresses matching this blocklist can be blocked, thereby preventing spoofed traffic from entering the domain.<a href="#section-3.1-2.4.2" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.1-3">For Edge SAV, Area Border SAV, and AS Border SAV, routers can establish interface-based prefix allowlists or blocklists either manually or based on the local LSDB. For Transit SAV, routers should be aware of the valid incoming interfaces for a given source prefix in order to establish a prefix-based interface allowlist. Packets with source addresses matching this source prefix are normally forwarded only when their incoming interfaces are in the allowlist. Otherwise, they should be processed according to predefined security policies, which may include actions like packet dropping or rate limiting. If the source address of a packet does not match any recorded source prefix, the packet is considered valid by default.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">In OSPF networks, packets are typically forwarded along the paths specified by the Shortest Path Tree (SPT). However, if a router has enabled Policy-Based Routing (PBR), the packets will be preferentially forwarded to the next hop as designated by the PBR rules. Transit routers must be aware of all valid incoming interfaces for a source prefix to avoid improper blocking of packets with legitimate source addresses. An effective approach is for the router owning that source prefix to proactively send SAV messages to these transit routers. The messages should inform the routers about which interfaces packets matching that source prefix will reach along the actual forwarding paths, including those determined by the routing protocol and those specified by PBR. To accomplish this, routers can generate a SAV message for a protected source prefix, specifying the neighboring router to receive the message and the destination routers to which the message will be ultimately advertised. The SAV message propagates along the actual forwarding path of the source prefix. Routers receiving a SAV message through an interface recognize that interface as valid for the source prefix conveyed in the message. Based on the received SAV messages, routers can establish a prefix-based interface allowlist (see <span>[<a href="#sav-table" class="cite xref">sav-table</a>]</span>) for data-plane SAV filtering.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">A SAV message should at least include the following fields:<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlNewline" id="section-3.1-6">
+          <dt id="section-3.1-6.1">Message Type (MT)</dt>
+          <dd style="margin-left: 1.5em" id="section-3.1-6.2">
+            <p id="section-3.1-6.2.1">Distinguishes SAV messages based on the kind of routing information used to generate the message. 'S' means the message is generated based on SPT. 'P' means the message is generated based on PBR rules.<a href="#section-3.1-6.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.1-6.3">Source Router ID (SR)</dt>
+          <dd style="margin-left: 1.5em" id="section-3.1-6.4">
+            <p id="section-3.1-6.4.1">The identifier of the router that generated the message.<a href="#section-3.1-6.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.1-6.5">Source Prefix (SP)</dt>
+          <dd style="margin-left: 1.5em" id="section-3.1-6.6">
+            <p id="section-3.1-6.6.1">The source prefix that the message seeks to protect.<a href="#section-3.1-6.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.1-6.7">Neighbor Router ID (NR)</dt>
+          <dd style="margin-left: 1.5em" id="section-3.1-6.8">
+            <p id="section-3.1-6.8.1">The identifier of the neighbor router to which the message is sent.<a href="#section-3.1-6.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.1-6.9">Destination Router ID (DR)</dt>
+          <dd style="margin-left: 1.5em" id="section-3.1-6.10">
+            <p id="section-3.1-6.10.1">The destination router's identifier, to which the message is ultimately advertised.<a href="#section-3.1-6.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.1-6.11">Destination Prefix (DP)</dt>
+          <dd style="margin-left: 1.5em" id="section-3.1-6.12">
+            <p id="section-3.1-6.12.1">The destination prefix to which the message is ultimately advertised.<a href="#section-3.1-6.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-3.1-7"><a href="#spt-sec" class="auto internal xref">Section 3.2</a> and <a href="#pbr-sec" class="auto internal xref">Section 3.3</a> respectively elaborate on the generation and propagation of SAV messages in scenarios only involving conventional routing and those with PBR enabled. The format of each field in a SAV message is specific to the OSPF version used, which will be explained in <a href="#ospf-extension-sec" class="auto internal xref">Section 4</a>.<a href="#section-3.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="spt-sec">
+<section id="section-3.2">
+        <h3 id="name-sav-message-propagation-bas">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-sav-message-propagation-bas" class="section-name selfRef">SAV Message Propagation based on SPT</a>
+        </h3>
+<p id="section-3.2-1">This section describes how intra-domain routers generate and propagate SAV messages based on the local Shortest Path Tree (SPT) and establish SAV rules. <a href="#intra_topo" class="auto internal xref">Figure 1</a> shows an intra-domain network running the OSPF protocol. The SPT of Router R1 is shown in <a href="#intra_spt" class="auto internal xref">Figure 2</a>. Packets originating from R1, with a source address within the subnet 10.1.0.0/16, are forwarded along this SPT path. The SAV message generated by R1 should be propagated along the SPT to all leaf node routers, carrying the prefix 10.1.0.0/16. All routers along the path can then receive the message and establish local SAV rules for this prefix. Similarly, ABRs and ASBRs can send SAV messages along the SPT to other routers within the area. These messages carry prefixes from other areas or ASes, enabling the routers to establish SAV rules for these prefixes.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">Specifically, the SPT of R1 includes leaf nodes R3, R5, and R6, with R3 directly connected to R1, while R5 and R6 are in the subtree of neighbor R2. R1 needs to generate SAV messages for neighbor R2 and R3. The MT field is set to 'S' (SPT-based), SR is R1, and SP is 10.1.0.0/16. The message to R2 includes NR as R2 and DR as R5 and R6. The message to R3 includes both NR and DR as R3. Upon receiving R1’s SAV message from link R1-R2, R2 establishes the SAV rule &lt;10.1.0.0/16, int.2.1&gt;, indicating that interface 2.1 is the valid incoming interface for the prefix 10.1.0.0/16. Similarly, R3 establishes the SAV rule &lt;10.1.0.0/16, int.3.1&gt;, indicating that interface 3.1 is the valid incoming interface for the prefix. Since the message received by R3 indicates DR as R3 itself, it does not need to propagate the message further. R2, however, needs to propagate the message to R5 and R6 according to its local SPT. R5 is directly connected to R2, while R6 is in the subtree of neighbor R4. Therefore, R2 generates messages for neighbor R4 and R5, keeping the MT, SR, and SP fields unchanged. R2’s message to R4 includes NR as R4 and DR as R6. R2’s message to R5 includes NR as R5 and DR as R5. Upon receiving the message from R2, R4 and R5 establish local SAV rules &lt;10.1.0.0/16, int.4.1&gt; and &lt;10.1.0.0/16, int.5.2&gt;, respectively. Similarly, R4 continues to propagate the message to R6 based on the local SPT, and R6 establishes the SAV rule &lt;10.1.0.0/16, int.6.1&gt;. Thus, all routers on the SPT of R1 can learn the valid incoming interfaces for R1’s source prefix. If a packet with a source address within the prefix 10.1.0.0/16 is received on a invalid interface, such as R5 receiving a packet at interface 5.1, predefined security measures like packet dropping, rate limiting, or traffic monitoring may be taken.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <span id="name-an-example-of-intra-domain-"></span><div id="intra_topo">
 <figure id="figure-1">
-        <div id="section-1-2.1">
-          <div class="alignLeft art-svg artwork" id="section-1-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="408" viewBox="0 0 408 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-              <path d="M 88,128 L 88,160" fill="none" stroke="black"></path>
-              <path d="M 128,128 L 128,160" fill="none" stroke="black"></path>
-              <path d="M 168,48 L 168,80" fill="none" stroke="black"></path>
-              <path d="M 168,192 L 168,224" fill="none" stroke="black"></path>
-              <path d="M 208,48 L 208,80" fill="none" stroke="black"></path>
-              <path d="M 208,192 L 208,224" fill="none" stroke="black"></path>
-              <path d="M 280,32 L 280,80" fill="none" stroke="black"></path>
-              <path d="M 280,176 L 280,224" fill="none" stroke="black"></path>
-              <path d="M 304,80 L 304,192" fill="none" stroke="black"></path>
-              <path d="M 320,48 L 320,80" fill="none" stroke="black"></path>
-              <path d="M 320,192 L 320,224" fill="none" stroke="black"></path>
-              <path d="M 360,128 L 360,160" fill="none" stroke="black"></path>
-              <path d="M 400,128 L 400,160" fill="none" stroke="black"></path>
-              <path d="M 168,48 L 208,48" fill="none" stroke="black"></path>
-              <path d="M 280,48 L 320,48" fill="none" stroke="black"></path>
-              <path d="M 208,64 L 280,64" fill="none" stroke="black"></path>
-              <path d="M 168,80 L 208,80" fill="none" stroke="black"></path>
-              <path d="M 280,80 L 320,80" fill="none" stroke="black"></path>
-              <path d="M 88,128 L 128,128" fill="none" stroke="black"></path>
-              <path d="M 360,128 L 400,128" fill="none" stroke="black"></path>
-              <path d="M 88,160 L 128,160" fill="none" stroke="black"></path>
-              <path d="M 360,160 L 400,160" fill="none" stroke="black"></path>
-              <path d="M 24,176 L 64,176" fill="none" stroke="black"></path>
-              <path d="M 168,192 L 208,192" fill="none" stroke="black"></path>
-              <path d="M 280,192 L 320,192" fill="none" stroke="black"></path>
-              <path d="M 24,208 L 64,208" fill="none" stroke="black"></path>
-              <path d="M 208,208 L 280,208" fill="none" stroke="black"></path>
-              <path d="M 168,224 L 208,224" fill="none" stroke="black"></path>
-              <path d="M 280,224 L 320,224" fill="none" stroke="black"></path>
-              <path d="M 124,136 L 168,224" fill="none" stroke="black"></path>
-              <path d="M 208,64 L 280,208" fill="none" stroke="black"></path>
-              <path d="M 316,56 L 364,152" fill="none" stroke="black"></path>
-              <path d="M 72,176 L 92,136" fill="none" stroke="black"></path>
-              <path d="M 124,152 L 172,56" fill="none" stroke="black"></path>
-              <path d="M 208,208 L 280,64" fill="none" stroke="black"></path>
-              <path d="M 320,224 L 364,136" fill="none" stroke="black"></path>
-              <g class="text">
-                <text x="256" y="36">int.4</text>
-                <text x="288" y="36">1</text>
-                <text x="136" y="68">int.2.1</text>
-                <text x="188" y="68">R2</text>
-                <text x="300" y="68">R4</text>
-                <text x="376" y="116">int.6.1</text>
-                <text x="108" y="148">R1</text>
-                <text x="380" y="148">R6</text>
-                <text x="284" y="164">int.</text>
-                <text x="272" y="180">5</text>
-                <text x="288" y="180">2</text>
-                <text x="44" y="196">(subnet)</text>
-                <text x="188" y="212">R3</text>
-                <text x="300" y="212">R5</text>
-                <text x="48" y="228">10.1.0.0/16</text>
-                <text x="144" y="244">int.3.1</text>
-                <text x="264" y="244">int.5.1</text>
-              </g>
-            </svg><a href="#section-1-2.1.1" class="pilcrow">¶</a>
-</div>
+          <div class="alignLeft art-text artwork" id="section-3.2-3.1">
+<pre>
+                             int.4.1
+                    +----+        +----+
+             int.2.1| R2 +--------+ R4 |
+                   /+----+\      /+--+-+\
+                  /        \    /        \
+                 /          \  /          \int.6.1
+          +----+/            \/            \+----+
+          | R1 |             /\             | R6 |
+         /+----+\           /  \           /+----+
+  ------/        \         /    \int.5.2  /int.6.2
+ (subnet)         \ +----+/      \+--+-+ /
+  ------           \| R3 +--------+ R5 |/
+10.1.0.0/16         +----+        +----+
+              int.3.1        int.5.1
+</pre>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-an-example-of-intra-domain-" class="selfRef">An example of intra-domain network.</a>
-        </figcaption></figure>
+          </figcaption></figure>
+</div>
+<span id="name-sav-message-propagation-alo"></span><div id="intra_spt">
+<figure id="figure-2">
+          <div class="alignLeft art-text artwork" id="section-3.2-4.1">
+<pre>
+          R2 SAV rules                  R4 SAV rules
+          &lt;10.1.0.0/16,int.2.1&gt;         &lt;10.1.0.0/16,int.4.1&gt;
+                    +----+        +----+
+                    | R2 +-------*| R4 |
+                   *+----+\       +----+\
+                  /        \             \
+                 /          \             \
+          +----+/            \             *+----+
+          | R1 |              \             | R6 |
+         /+----+\              \            +----+
+  ------/        \              \           R6 SAV rules
+ (subnet)         \ +----+       *+----+    &lt;10.1.0.0/16,int.6.1&gt;
+  ------           *| R3 |        | R5 |
+10.1.0.0/16         +----+        +----+
+             R3 SAV rules            R5 SAV rules
+             &lt;10.1.0.0/16,int.3.1&gt;   &lt;10.1.0.0/16,int.5.2&gt;
+
+* the interface that receives SAV message of 10.1.0.0/16 from R1
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-sav-message-propagation-alo" class="selfRef">SAV message propagation along the SPT of R1.</a>
+          </figcaption></figure>
+</div>
+<p id="section-3.2-5">SAV messages are propagated within an area. SAV messages generated by different routers carry different source prefix information based on their role.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">If a router is connected to a stub network, it should generate SAV messages to protect the prefixes of this stub network from being spoofed. To reduce communication overhead, the router can send a SAV message with the SP field set to a specific value. Routers receiving a message with SP set to this specific value use the prefixes of SR's stub network stored in the LSDB as source prefixes to be validated. They are included in the Router-LSA advertised by SR with link type "stub".<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-7">If a router is an ABR or ASBR, it can also generate SAV messages to protect the prefixes outside the area from being spoofed. For an ABR, the source prefix announced in a SAV message can be prefixes contained in summary-LSAs advertised within the area and prefixes contained in AS-external-LSAs received from other areas. For an ASBR, the source prefix announced in a SAV message can be prefixes contained in AS-external-LSAs advertised within the area. To reduce communication overhead, an ABR or ASBR can send a SAV message with the SP field set to a specific value. Routers receiving a message with SP set to a specific value use prefixes included in the summary-LSAs advertised by this ABR or prefixes included in the AS-external-LSAs advertised by this ASBR as source prefixes to be validated.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="pbr-sec">
+<section id="section-3.3">
+        <h3 id="name-sav-message-propagation-con">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-sav-message-propagation-con" class="section-name selfRef">SAV Message Propagation considering Policy-based Routing</a>
+        </h3>
+<p id="section-3.3-1">Policy-based routing (PBR) is a widely supported feature on modern routers. It enables network administrators to make routing decisions based on policies that reflect specific network requirements, rather than solely depending on routing tables generated by traditional routing protocols. This capability allows for finer control over traffic flows, facilitating decision-making based on criteria such as source and destination addresses, specific types of traffic, or even application data. By establishing PBR rules, administrators can direct different types of traffic along designated paths, thus addressing specific security or Quality of Service (QoS) needs effectively.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">In networks where routers are configured with PBR, it is crucial to propagate SAV messages not only along the paths determined by the SPT but also along paths specified by PBR rules. This ensures that all interfaces a source prefix might reach according to both traditional routing protocols and PBR are considered legitimate entry points, thereby minimizing the risk of improper blocking of valid traffic.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">Take <a href="#intra_topo" class="auto internal xref">Figure 1</a> as an example. Assume Router R1 has a local PBR rule defined as &lt;10.1.1.0/24, 10.5.0.0/16, R3&gt;. This rule redirects traffic from the source IP addresses within 10.1.1.0/24 heading towards the stub network connected to R5, to go via R3 instead. R1 should generate a SAV message based on this rule and propagate this message along link R1-R3 and R3-R5. This action designates interfaces int.3.1 at R3 and int.5.1 at R5 as vaid incoming interfaces for the prefix 10.1.1.0/24.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-4">Similarly, assume Router R2 has a PBR rule which redirects all traffic on port 80 going to the subnet 10.6.0.0/16 of R6 towards R5. Besides forwarding the SAV message originated from R1 to R6 along the SPT, R2 should also send the SAV message through R5 to reach R6 base on this PBR rule. This ensures that int.5.2 at R5 and int.6.2 at R6 are recognized as valid incoming interfaces for the source prefixes of R1.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
+<div id="sav-message-generation">
+<section id="section-3.3.1">
+          <h4 id="name-sav-message-generation">
+<a href="#section-3.3.1" class="section-number selfRef">3.3.1. </a><a href="#name-sav-message-generation" class="section-name selfRef">SAV Message Generation</a>
+          </h4>
+<p id="section-3.3.1-1">When a router, such as Router R1, is configured with PBR rules that direct specific types of traffic to a neighbor (e.g., R2), it is essential for R1 to generate SAV messages based on these PBR rules and send them to R2. This enables R2 to permit the corresponding traffic through and to continue propagating the SAV information to other relevant routers within the domain. The fields for SAV messages generated based on PBR rules are set as follows:<a href="#section-3.3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3.1-2.1">
+              <p id="section-3.3.1-2.1.1"><strong>MT</strong>: Set to 'P' (PBR-based).<a href="#section-3.3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.3.1-2.2">
+              <p id="section-3.3.1-2.2.1"><strong>SR</strong>: R1.<a href="#section-3.3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.3.1-2.3">
+              <p id="section-3.3.1-2.3.1"><strong>NR</strong>: R2.<a href="#section-3.3.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.3.1-2.4">
+              <p id="section-3.3.1-2.4.1"><strong>SP</strong>, <strong>DR</strong>, and <strong>DP</strong>: Depend on the type of the PBR rule. Given that SAV messages are primarily concerned with sending which source prefixes to which destinations, PBR rules are divided into four categories based on the specification of source and destination prefixes. Other parameters in the rules, such as port numbers, are represented as 'other' and are not considered in the generation of SAV messages.<a href="#section-3.3.1-2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.3.1-2.4.2">
+<li id="section-3.3.1-2.4.2.1">
+                  <p id="section-3.3.1-2.4.2.1.1"><strong>&lt;srcIP, *, other, nexthop&gt;</strong>: This implies that packets with a source address belonging to srcIP may reach any router in the domain through nexthop R2. Thus, SP is set to srcIP, while DR and DP are not specifically defined.<a href="#section-3.3.1-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-3.3.1-2.4.2.2">
+                  <p id="section-3.3.1-2.4.2.2.1"><strong>&lt;*, dstIP, other, nexthop&gt;</strong>: This implies that any packet from R1 might reach the router associated with dstIP through nexthop R2. Hence, SP is set to a default value representing all source prefixes of R1, DP is set to dstIP, and DR is not specifically defined.<a href="#section-3.3.1-2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-3.3.1-2.4.2.3">
+                  <p id="section-3.3.1-2.4.2.3.1"><strong>&lt;srcIP, dstIP, other, nexthop&gt;</strong>: This implies that packets with a source address belonging to srcIP may reach the router associated with dstIP through nexthop R2. Therefore, SP is set to srcIP, DP is set to dstIP, and DR is not specifically defined.<a href="#section-3.3.1-2.4.2.3.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-3.3.1-2.4.2.4">
+                  <p id="section-3.3.1-2.4.2.4.1"><strong>&lt;*, *, other, nexthop&gt;</strong>: This implies that any packet from R1 may reach any router in the domain through nexthop R2. Thus, SP is set to a default value representing all source prefixes of R1, while DR and DP are not specifically defined.<a href="#section-3.3.1-2.4.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
+<p id="section-3.3.1-2.4.3">
+For cases where DR and DP are not specifically defined, nexthop R2 determines the endpoints of the SAV message propagation based on local routing policies (see <a href="#pbr-forwarding-sec" class="auto internal xref">Section 3.3.2</a>).<a href="#section-3.3.1-2.4.3" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</section>
+</div>
+<div id="pbr-forwarding-sec">
+<section id="section-3.3.2">
+          <h4 id="name-sav-message-forwarding">
+<a href="#section-3.3.2" class="section-number selfRef">3.3.2. </a><a href="#name-sav-message-forwarding" class="section-name selfRef">SAV Message Forwarding</a>
+          </h4>
+<p id="section-3.3.2-1">When Router R2, configured with PBR rules, receives a SAV message from Router R1, it must forward this message along both the SPT paths and the paths specified by its PBR rules. R2 uses the DR and DP fields to determine whether it is the endpoint of the message propagation. If not, and the intended neighbor for message forwarding is in the same area, the message is forwarded accordingly. SR and SP remain unchanged, while NR is updated to the intended neighbor. Other fields are handled as follows:<a href="#section-3.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-2"><strong>MT:</strong><a href="#section-3.3.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3.2-3.1">
+              <p id="section-3.3.2-3.1.1">If the received message’s MT is 'P' (PBR-based), it remains unchanged during forwarding.<a href="#section-3.3.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.3.2-3.2">
+              <p id="section-3.3.2-3.2.1">If the received message’s MT is 'S' (SPT-based), and the message is forwarded based on local PBR rules, MT is changed to 'P'.<a href="#section-3.3.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-3.3.2-4"><strong>DR &amp; DP:</strong><a href="#section-3.3.2-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3.2-5.1">
+              <p id="section-3.3.2-5.1.1">If the received message specifies DP as dstIP:<a href="#section-3.3.2-5.1.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.3.2-5.1.2">
+<li id="section-3.3.2-5.1.2.1">
+                  <p id="section-3.3.2-5.1.2.1.1">Forward the message to the next-hop of dstIP in the Forwarding Information Base (FIB), keeping DR and DP unchanged.<a href="#section-3.3.2-5.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-3.3.2-5.1.2.2">
+                  <p id="section-3.3.2-5.1.2.2.1">If there is a local PBR rule of type <code>&lt;*, dstIP, other, nexthop&gt;</code> or <code>&lt;*, *, other, nexthop&gt;</code>, forward the message to the nexthops in these rules, keeping DR and DP unchanged.<a href="#section-3.3.2-5.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
+</li>
+            <li class="normal" id="section-3.3.2-5.2">
+              <p id="section-3.3.2-5.2.1">If the received message specifies DR:<a href="#section-3.3.2-5.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3.2-5.2.2.1">
+                  <p id="section-3.3.2-5.2.2.1.1"><strong>Case 1:</strong> If the received message type is 'S':<a href="#section-3.3.2-5.2.2.1.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.3.2-5.2.2.1.2">
+<li id="section-3.3.2-5.2.2.1.2.1">
+                      <p id="section-3.3.2-5.2.2.1.2.1.1">Forward the message based on local SPT(see <a href="#spt-sec" class="auto internal xref">Section 3.2</a>).<a href="#section-3.3.2-5.2.2.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-3.3.2-5.2.2.1.2.2">
+                      <p id="section-3.3.2-5.2.2.1.2.2.1">If there is a local PBR rule <code>&lt;*, dstIP, other, nexthop&gt;</code> and dstIP belongs to the nodes along the SPT path to DR, forward the message to nexthop, updating DP to dstIP, leaving DR unspecified.<a href="#section-3.3.2-5.2.2.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-3.3.2-5.2.2.1.2.3">
+                      <p id="section-3.3.2-5.2.2.1.2.3.1">If there is a local PBR rule <code>&lt;*, *, other, nexthop&gt;</code>, forward the message to nexthop, updating DR to include all Router IDs of the nodes along the SPT path to DR, leaving DP unspecified.<a href="#section-3.3.2-5.2.2.1.2.3.1" class="pilcrow">¶</a></p>
+</li>
+                  </ol>
+</li>
+                <li class="normal" id="section-3.3.2-5.2.2.2">
+                  <p id="section-3.3.2-5.2.2.2.1"><strong>Case 2:</strong> If the received message type is 'P':<a href="#section-3.3.2-5.2.2.2.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.3.2-5.2.2.2.2">
+<li id="section-3.3.2-5.2.2.2.2.1">
+                      <p id="section-3.3.2-5.2.2.2.2.1.1">Forward the message based on local SPT(see <a href="#spt-sec" class="auto internal xref">Section 3.2</a>).<a href="#section-3.3.2-5.2.2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-3.3.2-5.2.2.2.2.2">
+                      <p id="section-3.3.2-5.2.2.2.2.2.1">If there is a local PBR rule <code>&lt;*, dstIP, other, nexthop&gt;</code> and dstIP belongs to DR, forward the message to nexthop, updating DP to dstIP, leaving DR unspecified.<a href="#section-3.3.2-5.2.2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-3.3.2-5.2.2.2.2.3">
+                      <p id="section-3.3.2-5.2.2.2.2.3.1">If there is a local PBR rule <code>&lt;*, *, other, nexthop&gt;</code>, forward the message to nexthop, keeping DR and DP unchanged.<a href="#section-3.3.2-5.2.2.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+                  </ol>
+</li>
+              </ul>
+</li>
+            <li class="normal" id="section-3.3.2-5.3">
+              <p id="section-3.3.2-5.3.1">If the received message does not specify DR and DP:<a href="#section-3.3.2-5.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.3.2-5.3.2">
+<li id="section-3.3.2-5.3.2.1">
+                  <p id="section-3.3.2-5.3.2.1.1">Forward the message to all the other neighbors, updating DR to include all reachable nodes through these neighbors on SPT, leaving DP unspecified.<a href="#section-3.3.2-5.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-3.3.2-5.3.2.2">
+                  <p id="section-3.3.2-5.3.2.2.1">If there is a local PBR rule <code>&lt;*, dstIP, other, nexthop&gt;</code>, forward the message to nexthop, setting DP to dstIP, leaving DR unspecified.<a href="#section-3.3.2-5.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-3.3.2-5.3.2.3">
+                  <p id="section-3.3.2-5.3.2.3.1">If there is a local PBR rule <code>&lt;*, *, other, nexthop&gt;</code>, forward the message to nexthop, keeping DR and DP unchanged.<a href="#section-3.3.2-5.3.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
+</li>
+          </ul>
+<p id="section-3.3.2-6">The primary difference between SPT-based and PBR-based SAV messages lies in the content of the DR field. SPT-based messages only record SPT leaf nodes since SAV messages are sent along the SPT path to these leaf nodes, and intermediate nodes on this path do not need to be explicitly listed to receive the message. This approach reduces message length and communication overhead. In contrast, PBR-based messages must record all nodes reachable by the message to ensure that it reaches all intended destinations.<a href="#section-3.3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-7">It is important to note that the description provided above outlines only the basic logic for the coummunication of SAV messages. In practice, to optimize communication, messages that share the same MT and SP fields and are directed to the same NR can be consolidated before being sent.<a href="#section-3.3.2-7" class="pilcrow">¶</a></p>
+</section>
 </div>
 </section>
 </div>
-<div id="conventions-and-definitions">
-<section id="section-2">
-      <h2 id="name-conventions-and-definitions">
-<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+</section>
+</div>
+<div id="ospf-extension-sec">
+<section id="section-4">
+      <h2 id="name-protocol-extension">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-protocol-extension" class="section-name selfRef">Protocol Extension</a>
       </h2>
-<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
-"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
-described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
-appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="extensions-to-ospfv2-for-sav-message-propagation">
+<section id="section-4.1">
+        <h3 id="name-extensions-to-ospfv2-for-sa">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-extensions-to-ospfv2-for-sa" class="section-name selfRef">Extensions to OSPFv2 for SAV Message Propagation</a>
+        </h3>
+<p id="section-4.1-1">This document proposes extensions to OSPFv2 to support the dissemination of SAV messages via the OSPF protocol. The extension utilizes OSPFv2 Extended Prefix Opaque LSA as defined in <span>[<a href="#RFC7684" class="cite xref">RFC7684</a>]</span>. The Advertising Router field is utilized to represent the SR within a SAV message, which denotes the origin of the SAV message. The LS Type is 10, which is scoped to an area-local visibility.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">The OSPFv2 Extended Prefix Opaque LSA may contain one or more Extended Prefix TLVs. Each TLV is used to carry specific source prefix (SP) information pertinent to SAV. The Address Prefix field specifies the IP address of the source prefix. The Prefix Length field indicates the length of the source prefix.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">A new sub-TLV, termed the "Source Prefix Validation Sub-TLV," is introduced within the Extended Prefix TLV. This sub-TLV is designed to encapsulate additional fields required for SAV, excluding SR and SP, which are already detailed above. It has the following format:<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<span id="name-ospfv2-source-prefix-valida"></span><div id="sav_ospfv2">
+<figure id="figure-3">
+          <div class="alignLeft art-text artwork" id="section-4.1-4.1">
+<pre>
+  0                   1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |           Type (TBD)          |            Length             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |         Message Type          |           Reserved            |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                     Neighbor Router (NR)                      |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |            DR Count            |         DP Count             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                   Destination Router (DR) 1                   |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                            ......                             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                   Destination Router (DR) n                   |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |  DP 1 Length  |      Destination Prefix (DP) 1 (variable)     |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                            ......                             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |  DP n Length  |      Destination Prefix (DP) n (variable)     |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-ospfv2-source-prefix-valida" class="selfRef">OSPFv2 Source Prefix Validation Sub-TLV</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlNewline" id="section-4.1-5">
+          <dt id="section-4.1-5.1">Type</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.2">
+            <p id="section-4.1-5.2.1">The type of the Sub-TLV. Value TBD.<a href="#section-4.1-5.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.3">Length</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.4">
+            <p id="section-4.1-5.4.1">The total length of the Sub-TLV in bytes, excluding the Type and Length fields.<a href="#section-4.1-5.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.5">Message Type</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.6">
+            <p id="section-4.1-5.6.1">0 - the SAV message is based on SPT<a href="#section-4.1-5.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.7"></dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.8">
+            <p id="section-4.1-5.8.1">1 - the SAV message is based on PBR<a href="#section-4.1-5.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.9">Reserved</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.10">
+            <p id="section-4.1-5.10.1"><span class="bcp14">SHOULD</span> be set to 0 on transmission and <span class="bcp14">MUST</span> be ignored on reception.<a href="#section-4.1-5.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.11">NR</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.12">
+            <p id="section-4.1-5.12.1">The Neighbor Router ID to which the SAV message is sent.<a href="#section-4.1-5.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.13">DR Count</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.14">
+            <p id="section-4.1-5.14.1">The number of Destination Router IDs included in this Sub-TLV.<a href="#section-4.1-5.14.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.15">DP Count</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.16">
+            <p id="section-4.1-5.16.1">The number of Destination Prefixes included in this Sub-TLV.<a href="#section-4.1-5.16.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.17">DR</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.18">
+            <p id="section-4.1-5.18.1">Each DR field represents a Destination Router ID to which the SAV message is ultimately advertised. The number of DR fields corresponds to the value in the DR Count field.<a href="#section-4.1-5.18.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.19">DP Length</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.20">
+            <p id="section-4.1-5.20.1">Length of a Destination Prefix in bits.<a href="#section-4.1-5.20.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-5.21">DP</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-5.22">
+            <p id="section-4.1-5.22.1">Each DP field represents a Destination Prefix to which the message is ultimately advertised. The number of DP fields corresponds to the value in the DP Count field.<a href="#section-4.1-5.22.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-4.1-6">An OSPFv2 Extended Prefix TLV can contain multiple OSPFv2 Source Prefix Validation Sub-TLVs, each of which can specify only one NR. Routers that receive this TLV process only the Sub-TLV where the NR field matches their own Router ID and ignore others.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="extensions-to-ospfv3-for-sav-message-propagation">
+<section id="section-4.2">
+        <h3 id="name-extensions-to-ospfv3-for-sa">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-extensions-to-ospfv3-for-sa" class="section-name selfRef">Extensions to OSPFv3 for SAV Message Propagation</a>
+        </h3>
+<p id="section-4.2-1">In networks utilizing the OSPFv3 protocol, SAV messages are advertised through OSPFv3 Extended LSAs, including E-Intra-Area-Prefix-LSA, E-Inter-Area-Prefix-LSA and E-AS-External-LSA <span>[<a href="#RFC8362" class="cite xref">RFC8362</a>]</span>. The Advertising Router field is used to represent the SR within a SAV message. The Address Prefix and PrefixLength fields of the Intra-Area Prefix TLV, Inter-Area Prefix TLV, and External-Prefix TLV are used to represent a specific SP. Additionally, A new OSPFv3 Source Prefix Validation sub-TLV is defined to be included in these TLVs to carry SAV message fields excluding SR and SP. The format of this new sub-TLV is as follows:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<span id="name-ospfv3-source-prefix-valida"></span><div id="sav_ospfv3">
+<figure id="figure-4">
+          <div class="alignLeft art-text artwork" id="section-4.2-2.1">
+<pre>
+  0                   1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |           Type (TBD)          |            Length             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |         Message Type          |           Reserved            |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                     Neighbor Router (NR)                      |
+ |                             ...                               |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |            DR Count            |         DP Count             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                   Destination Router (DR) 1                   |
+ |                             ...                               |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                            ......                             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                   Destination Router (DR) n                   |
+ |                             ...                               |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |  DP 1 Length  |      Destination Prefix (DP) 1 (variable)     |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                            ......                             |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |  DP n Length  |      Destination Prefix (DP) n (variable)     |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-ospfv3-source-prefix-valida" class="selfRef">OSPFv3 Source Prefix Validation Sub-TLV</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlNewline" id="section-4.2-3">
+          <dt id="section-4.2-3.1">Type</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.2">
+            <p id="section-4.2-3.2.1">The type of the Sub-TLV. Value TBD.<a href="#section-4.2-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.3">Length</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.4">
+            <p id="section-4.2-3.4.1">The total length of the Sub-TLV in bytes, excluding the Type and Length fields.<a href="#section-4.2-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.5">Message Type</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.6">
+            <p id="section-4.2-3.6.1">0 - the SAV message is based on SPT<a href="#section-4.2-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.7"></dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.8">
+            <p id="section-4.2-3.8.1">1 - the SAV message is based on PBR<a href="#section-4.2-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.9">Reserved</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.10">
+            <p id="section-4.2-3.10.1"><span class="bcp14">SHOULD</span> be set to 0 on transmission and <span class="bcp14">MUST</span> be ignored on reception.<a href="#section-4.2-3.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.11">NR</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.12">
+            <p id="section-4.2-3.12.1">The Neighbor Router ID to which the SAV message is sent.<a href="#section-4.2-3.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.13">DR Count</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.14">
+            <p id="section-4.2-3.14.1">The number of Destination Router IDs included in this Sub-TLV.<a href="#section-4.2-3.14.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.15">DP Count</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.16">
+            <p id="section-4.2-3.16.1">The number of Destination Prefixes included in this Sub-TLV.<a href="#section-4.2-3.16.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.17">DR</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.18">
+            <p id="section-4.2-3.18.1">Each DR field represents a Destination Router ID to which the SAV message is ultimately advertised. The number of DR fields corresponds to the value in the DR Count field.<a href="#section-4.2-3.18.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.19">DP Length</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.20">
+            <p id="section-4.2-3.20.1">Length of a Destination Prefix in bits.<a href="#section-4.2-3.20.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-3.21">DP</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-3.22">
+            <p id="section-4.2-3.22.1">Each DP field represents a Destination Prefix to which the message is ultimately advertised. The number of DP fields corresponds to the value in the DP Count field.<a href="#section-4.2-3.22.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-4.2-4">An Intra-Area Prefix TLV, Inter-Area Prefix TLV, or External-Prefix TLV can contain multiple OSPFv3 Source Prefix Validation Sub-TLVs, each specifying only one NR. Routers receiving the TLV only process the Sub-TLV where the NR field matches their own Router ID and ignore others.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="use-cases">
+<section id="section-5">
+      <h2 id="name-use-cases">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-use-cases" class="section-name selfRef">Use Cases</a>
+      </h2>
+<p id="section-5-1">For intra-domain networks, source address spoofing primarily occurs in the following scenarios: Firstly, a stub network within the domain might spoof the source addresses of other networks, which could be those within the same area, other areas within the domain, or even other ASes. Secondly, packets from other ASes spoofing the source addresses of a domain might enter this domain. This section uses  <a href="#sav_usecase" class="auto internal xref">Figure 5</a> as an example to comprehensively demonstrate the typical scenarios of intra-domain source address spoofing and explain how to effectively implement intra-domain SAV using the approaches proposed in this document.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<span id="name-intra-domain-savnet-use-cas"></span><div id="sav_usecase">
+<figure id="figure-5">
+        <div id="section-5-2.1">
+          <div class="alignLeft art-svg artwork" id="section-5-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="864" width="792" viewBox="0 0 792 864" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,48 L 8,432" fill="none" stroke="black"></path>
+              <path d="M 8,464 L 8,832" fill="none" stroke="black"></path>
+              <path d="M 24,96 L 24,416" fill="none" stroke="black"></path>
+              <path d="M 24,512 L 24,816" fill="none" stroke="black"></path>
+              <path d="M 120,208 L 120,240" fill="none" stroke="black"></path>
+              <path d="M 120,624 L 120,656" fill="none" stroke="black"></path>
+              <path d="M 144,144 L 144,208" fill="none" stroke="black"></path>
+              <path d="M 144,240 L 144,288" fill="none" stroke="black"></path>
+              <path d="M 160,208 L 160,240" fill="none" stroke="black"></path>
+              <path d="M 160,624 L 160,656" fill="none" stroke="black"></path>
+              <path d="M 192,128 L 192,160" fill="none" stroke="black"></path>
+              <path d="M 192,272 L 192,304" fill="none" stroke="black"></path>
+              <path d="M 200,544 L 200,576" fill="none" stroke="black"></path>
+              <path d="M 200,688 L 200,720" fill="none" stroke="black"></path>
+              <path d="M 216,312 L 216,352" fill="none" stroke="black"></path>
+              <path d="M 224,720 L 224,752" fill="none" stroke="black"></path>
+              <path d="M 232,128 L 232,160" fill="none" stroke="black"></path>
+              <path d="M 232,272 L 232,304" fill="none" stroke="black"></path>
+              <path d="M 240,544 L 240,576" fill="none" stroke="black"></path>
+              <path d="M 240,688 L 240,720" fill="none" stroke="black"></path>
+              <path d="M 304,128 L 304,160" fill="none" stroke="black"></path>
+              <path d="M 304,272 L 304,304" fill="none" stroke="black"></path>
+              <path d="M 312,544 L 312,576" fill="none" stroke="black"></path>
+              <path d="M 312,688 L 312,720" fill="none" stroke="black"></path>
+              <path d="M 328,312 L 328,352" fill="none" stroke="black"></path>
+              <path d="M 336,576 L 336,688" fill="none" stroke="black"></path>
+              <path d="M 336,720 L 336,752" fill="none" stroke="black"></path>
+              <path d="M 344,128 L 344,160" fill="none" stroke="black"></path>
+              <path d="M 344,272 L 344,304" fill="none" stroke="black"></path>
+              <path d="M 352,544 L 352,576" fill="none" stroke="black"></path>
+              <path d="M 352,688 L 352,720" fill="none" stroke="black"></path>
+              <path d="M 376,208 L 376,240" fill="none" stroke="black"></path>
+              <path d="M 384,144 L 384,208" fill="none" stroke="black"></path>
+              <path d="M 384,240 L 384,288" fill="none" stroke="black"></path>
+              <path d="M 392,624 L 392,656" fill="none" stroke="black"></path>
+              <path d="M 400,96 L 400,208" fill="none" stroke="black"></path>
+              <path d="M 400,240 L 400,416" fill="none" stroke="black"></path>
+              <path d="M 400,512 L 400,624" fill="none" stroke="black"></path>
+              <path d="M 400,656 L 400,816" fill="none" stroke="black"></path>
+              <path d="M 416,96 L 416,208" fill="none" stroke="black"></path>
+              <path d="M 416,240 L 416,416" fill="none" stroke="black"></path>
+              <path d="M 424,512 L 424,616" fill="none" stroke="black"></path>
+              <path d="M 424,664 L 424,816" fill="none" stroke="black"></path>
+              <path d="M 432,144 L 432,208" fill="none" stroke="black"></path>
+              <path d="M 432,240 L 432,288" fill="none" stroke="black"></path>
+              <path d="M 432,624 L 432,656" fill="none" stroke="black"></path>
+              <path d="M 440,208 L 440,240" fill="none" stroke="black"></path>
+              <path d="M 472,544 L 472,576" fill="none" stroke="black"></path>
+              <path d="M 472,688 L 472,720" fill="none" stroke="black"></path>
+              <path d="M 480,128 L 480,160" fill="none" stroke="black"></path>
+              <path d="M 480,272 L 480,304" fill="none" stroke="black"></path>
+              <path d="M 488,720 L 488,752" fill="none" stroke="black"></path>
+              <path d="M 496,304 L 496,336" fill="none" stroke="black"></path>
+              <path d="M 512,544 L 512,576" fill="none" stroke="black"></path>
+              <path d="M 512,688 L 512,720" fill="none" stroke="black"></path>
+              <path d="M 520,128 L 520,160" fill="none" stroke="black"></path>
+              <path d="M 520,272 L 520,304" fill="none" stroke="black"></path>
+              <path d="M 544,208 L 544,240" fill="none" stroke="black"></path>
+              <path d="M 552,624 L 552,656" fill="none" stroke="black"></path>
+              <path d="M 568,144 L 568,208" fill="none" stroke="black"></path>
+              <path d="M 568,240 L 568,288" fill="none" stroke="black"></path>
+              <path d="M 592,208 L 592,240" fill="none" stroke="black"></path>
+              <path d="M 592,624 L 592,656" fill="none" stroke="black"></path>
+              <path d="M 608,96 L 608,216" fill="none" stroke="black"></path>
+              <path d="M 608,232 L 608,416" fill="none" stroke="black"></path>
+              <path d="M 608,512 L 608,632" fill="none" stroke="black"></path>
+              <path d="M 608,648 L 608,816" fill="none" stroke="black"></path>
+              <path d="M 624,48 L 624,216" fill="none" stroke="black"></path>
+              <path d="M 624,232 L 624,432" fill="none" stroke="black"></path>
+              <path d="M 624,464 L 624,632" fill="none" stroke="black"></path>
+              <path d="M 624,648 L 624,832" fill="none" stroke="black"></path>
+              <path d="M 648,48 L 648,216" fill="none" stroke="black"></path>
+              <path d="M 648,232 L 648,432" fill="none" stroke="black"></path>
+              <path d="M 656,464 L 656,632" fill="none" stroke="black"></path>
+              <path d="M 656,648 L 656,832" fill="none" stroke="black"></path>
+              <path d="M 680,208 L 680,240" fill="none" stroke="black"></path>
+              <path d="M 688,624 L 688,656" fill="none" stroke="black"></path>
+              <path d="M 712,248 L 712,288" fill="none" stroke="black"></path>
+              <path d="M 720,656 L 720,688" fill="none" stroke="black"></path>
+              <path d="M 736,208 L 736,240" fill="none" stroke="black"></path>
+              <path d="M 744,624 L 744,656" fill="none" stroke="black"></path>
+              <path d="M 768,48 L 768,432" fill="none" stroke="black"></path>
+              <path d="M 784,464 L 784,832" fill="none" stroke="black"></path>
+              <path d="M 8,48 L 624,48" fill="none" stroke="black"></path>
+              <path d="M 648,48 L 768,48" fill="none" stroke="black"></path>
+              <path d="M 24,96 L 400,96" fill="none" stroke="black"></path>
+              <path d="M 416,96 L 608,96" fill="none" stroke="black"></path>
+              <path d="M 192,128 L 232,128" fill="none" stroke="black"></path>
+              <path d="M 304,128 L 344,128" fill="none" stroke="black"></path>
+              <path d="M 480,128 L 520,128" fill="none" stroke="black"></path>
+              <path d="M 144,144 L 192,144" fill="none" stroke="black"></path>
+              <path d="M 232,144 L 304,144" fill="none" stroke="black"></path>
+              <path d="M 344,144 L 384,144" fill="none" stroke="black"></path>
+              <path d="M 432,144 L 480,144" fill="none" stroke="black"></path>
+              <path d="M 520,144 L 568,144" fill="none" stroke="black"></path>
+              <path d="M 192,160 L 232,160" fill="none" stroke="black"></path>
+              <path d="M 304,160 L 344,160" fill="none" stroke="black"></path>
+              <path d="M 480,160 L 520,160" fill="none" stroke="black"></path>
+              <path d="M 120,208 L 160,208" fill="none" stroke="black"></path>
+              <path d="M 376,208 L 440,208" fill="none" stroke="black"></path>
+              <path d="M 544,208 L 592,208" fill="none" stroke="black"></path>
+              <path d="M 680,208 L 736,208" fill="none" stroke="black"></path>
+              <path d="M 592,224 L 680,224" fill="none" stroke="black"></path>
+              <path d="M 120,240 L 160,240" fill="none" stroke="black"></path>
+              <path d="M 376,240 L 440,240" fill="none" stroke="black"></path>
+              <path d="M 544,240 L 592,240" fill="none" stroke="black"></path>
+              <path d="M 680,240 L 736,240" fill="none" stroke="black"></path>
+              <path d="M 80,272 L 104,272" fill="none" stroke="black"></path>
+              <path d="M 192,272 L 232,272" fill="none" stroke="black"></path>
+              <path d="M 304,272 L 344,272" fill="none" stroke="black"></path>
+              <path d="M 480,272 L 520,272" fill="none" stroke="black"></path>
+              <path d="M 144,288 L 192,288" fill="none" stroke="black"></path>
+              <path d="M 232,288 L 304,288" fill="none" stroke="black"></path>
+              <path d="M 344,288 L 384,288" fill="none" stroke="black"></path>
+              <path d="M 432,288 L 480,288" fill="none" stroke="black"></path>
+              <path d="M 520,288 L 568,288" fill="none" stroke="black"></path>
+              <path d="M 80,304 L 104,304" fill="none" stroke="black"></path>
+              <path d="M 192,304 L 232,304" fill="none" stroke="black"></path>
+              <path d="M 304,304 L 344,304" fill="none" stroke="black"></path>
+              <path d="M 480,304 L 520,304" fill="none" stroke="black"></path>
+              <path d="M 152,336 L 176,336" fill="none" stroke="black"></path>
+              <path d="M 488,336 L 512,336" fill="none" stroke="black"></path>
+              <path d="M 216,352 L 240,352" fill="none" stroke="black"></path>
+              <path d="M 304,352 L 328,352" fill="none" stroke="black"></path>
+              <path d="M 152,368 L 176,368" fill="none" stroke="black"></path>
+              <path d="M 488,368 L 512,368" fill="none" stroke="black"></path>
+              <path d="M 24,416 L 400,416" fill="none" stroke="black"></path>
+              <path d="M 416,416 L 608,416" fill="none" stroke="black"></path>
+              <path d="M 8,432 L 624,432" fill="none" stroke="black"></path>
+              <path d="M 648,432 L 768,432" fill="none" stroke="black"></path>
+              <path d="M 8,446 L 56,446" fill="none" stroke="black"></path>
+              <path d="M 8,450 L 56,450" fill="none" stroke="black"></path>
+              <path d="M 8,464 L 624,464" fill="none" stroke="black"></path>
+              <path d="M 656,464 L 784,464" fill="none" stroke="black"></path>
+              <path d="M 24,512 L 400,512" fill="none" stroke="black"></path>
+              <path d="M 424,512 L 608,512" fill="none" stroke="black"></path>
+              <path d="M 200,544 L 240,544" fill="none" stroke="black"></path>
+              <path d="M 312,544 L 352,544" fill="none" stroke="black"></path>
+              <path d="M 472,544 L 512,544" fill="none" stroke="black"></path>
+              <path d="M 240,560 L 312,560" fill="none" stroke="black"></path>
+              <path d="M 200,576 L 240,576" fill="none" stroke="black"></path>
+              <path d="M 312,576 L 352,576" fill="none" stroke="black"></path>
+              <path d="M 472,576 L 512,576" fill="none" stroke="black"></path>
+              <path d="M 120,624 L 160,624" fill="none" stroke="black"></path>
+              <path d="M 392,624 L 432,624" fill="none" stroke="black"></path>
+              <path d="M 552,624 L 592,624" fill="none" stroke="black"></path>
+              <path d="M 688,624 L 744,624" fill="none" stroke="black"></path>
+              <path d="M 592,640 L 688,640" fill="none" stroke="black"></path>
+              <path d="M 120,656 L 160,656" fill="none" stroke="black"></path>
+              <path d="M 392,656 L 432,656" fill="none" stroke="black"></path>
+              <path d="M 552,656 L 592,656" fill="none" stroke="black"></path>
+              <path d="M 688,656 L 712,656" fill="none" stroke="black"></path>
+              <path d="M 728,656 L 744,656" fill="none" stroke="black"></path>
+              <path d="M 64,672 L 88,672" fill="none" stroke="black"></path>
+              <path d="M 200,688 L 240,688" fill="none" stroke="black"></path>
+              <path d="M 312,688 L 352,688" fill="none" stroke="black"></path>
+              <path d="M 472,688 L 512,688" fill="none" stroke="black"></path>
+              <path d="M 64,704 L 88,704" fill="none" stroke="black"></path>
+              <path d="M 240,704 L 312,704" fill="none" stroke="black"></path>
+              <path d="M 200,720 L 216,720" fill="none" stroke="black"></path>
+              <path d="M 312,720 L 328,720" fill="none" stroke="black"></path>
+              <path d="M 472,720 L 512,720" fill="none" stroke="black"></path>
+              <path d="M 160,752 L 184,752" fill="none" stroke="black"></path>
+              <path d="M 224,752 L 248,752" fill="none" stroke="black"></path>
+              <path d="M 312,752 L 336,752" fill="none" stroke="black"></path>
+              <path d="M 480,752 L 504,752" fill="none" stroke="black"></path>
+              <path d="M 160,784 L 184,784" fill="none" stroke="black"></path>
+              <path d="M 480,784 L 504,784" fill="none" stroke="black"></path>
+              <path d="M 24,816 L 400,816" fill="none" stroke="black"></path>
+              <path d="M 424,816 L 608,816" fill="none" stroke="black"></path>
+              <path d="M 8,832 L 624,832" fill="none" stroke="black"></path>
+              <path d="M 656,832 L 784,832" fill="none" stroke="black"></path>
+              <path d="M 156,632 L 200,720" fill="none" stroke="black"></path>
+              <path d="M 240,560 L 312,704" fill="none" stroke="black"></path>
+              <path d="M 348,552 L 396,648" fill="none" stroke="black"></path>
+              <path d="M 428,632 L 472,720" fill="none" stroke="black"></path>
+              <path d="M 232,144 L 304,288" fill="none" stroke="black"></path>
+              <path d="M 508,552 L 556,648" fill="none" stroke="black"></path>
+              <path d="M 120,272 L 132,248" fill="none" stroke="black"></path>
+              <path d="M 104,320 L 112,304" fill="none" stroke="black"></path>
+              <path d="M 192,336 L 204,312" fill="none" stroke="black"></path>
+              <path d="M 232,288 L 304,144" fill="none" stroke="black"></path>
+              <path d="M 104,672 L 124,632" fill="none" stroke="black"></path>
+              <path d="M 156,648 L 204,552" fill="none" stroke="black"></path>
+              <path d="M 200,752 L 212,728" fill="none" stroke="black"></path>
+              <path d="M 240,704 L 312,560" fill="none" stroke="black"></path>
+              <path d="M 352,720 L 396,632" fill="none" stroke="black"></path>
+              <path d="M 428,648 L 476,552" fill="none" stroke="black"></path>
+              <path d="M 512,720 L 556,632" fill="none" stroke="black"></path>
+              <path d="M 392,208 C 383.16936,208 376,215.16936 376,224" fill="none" stroke="black"></path>
+              <path d="M 424,208 C 432.83064,208 440,215.16936 440,224" fill="none" stroke="black"></path>
+              <path d="M 392,240 C 383.16936,240 376,232.83064 376,224" fill="none" stroke="black"></path>
+              <path d="M 424,240 C 432.83064,240 440,232.83064 440,224" fill="none" stroke="black"></path>
+              <path d="M 408,624 C 399.16936,624 392,631.16936 392,640" fill="none" stroke="black"></path>
+              <path d="M 408,656 C 399.16936,656 392,648.83064 392,640" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="728,656 716,650.4 716,661.6" fill="black" transform="rotate(270,720,656)"></polygon>
+              <polygon class="arrowhead" points="720,248 708,242.4 708,253.6" fill="black" transform="rotate(270,712,248)"></polygon>
+              <polygon class="arrowhead" points="344,720 332,714.4 332,725.6" fill="black" transform="rotate(270,336,720)"></polygon>
+              <polygon class="arrowhead" points="336,312 324,306.4 324,317.6" fill="black" transform="rotate(270,328,312)"></polygon>
+              <polygon class="arrowhead" points="232,720 220,714.4 220,725.6" fill="black" transform="rotate(270,224,720)"></polygon>
+              <polygon class="arrowhead" points="224,312 212,306.4 212,317.6" fill="black" transform="rotate(270,216,312)"></polygon>
+              <g class="text">
+                <text x="32" y="36">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>
+                <text x="84" y="36">HEAD</text>
+                <text x="304" y="68">AS1(10.0.0.0/8)</text>
+                <text x="712" y="68">AS2</text>
+                <text x="708" y="84">(20.0.0.0/8)</text>
+                <text x="56" y="116">Area1</text>
+                <text x="456" y="116">Area0</text>
+                <text x="212" y="148">R2</text>
+                <text x="324" y="148">R4</text>
+                <text x="500" y="148">R7</text>
+                <text x="140" y="228">R1</text>
+                <text x="404" y="228">R6</text>
+                <text x="572" y="228">R9</text>
+                <text x="712" y="228">R20</text>
+                <text x="92" y="292">(subnet)</text>
+                <text x="212" y="292">R3</text>
+                <text x="324" y="292">R5</text>
+                <text x="500" y="292">R8</text>
+                <text x="712" y="308">spoofed</text>
+                <text x="68" y="324">10.1.0.0</text>
+                <text x="116" y="324">16</text>
+                <text x="712" y="324">10.1.0.0/16</text>
+                <text x="164" y="356">(subnet)</text>
+                <text x="272" y="356">spoofed</text>
+                <text x="500" y="356">(subnet)</text>
+                <text x="288" y="372">10.1.0.0/16</text>
+                <text x="172" y="388">0.3.0.0/16</text>
+                <text x="288" y="388">10.8.0.0/16</text>
+                <text x="504" y="388">10.8.0.0/16</text>
+                <text x="284" y="404">20.0.0.0/8</text>
+                <text x="304" y="484">AS1(10.0.0.0/8)</text>
+                <text x="720" y="484">AS2</text>
+                <text x="716" y="500">(20.0.0.0/8)</text>
+                <text x="56" y="532">Area1</text>
+                <text x="456" y="532">Area0</text>
+                <text x="220" y="564">R2</text>
+                <text x="332" y="564">R4</text>
+                <text x="492" y="564">R7</text>
+                <text x="140" y="644">R1</text>
+                <text x="412" y="644">R6</text>
+                <text x="572" y="644">R9</text>
+                <text x="720" y="644">R20</text>
+                <text x="76" y="692">(subnet)</text>
+                <text x="220" y="708">R3</text>
+                <text x="332" y="708">R5</text>
+                <text x="492" y="708">R8</text>
+                <text x="720" y="708">spoofed</text>
+                <text x="80" y="724">10.1.0.0/16</text>
+                <text x="232" y="724">-</text>
+                <text x="344" y="724">-</text>
+                <text x="720" y="724">10.1.0.0/16</text>
+                <text x="280" y="756">spoofed</text>
+                <text x="172" y="772">(subnet)</text>
+                <text x="296" y="772">10.1.0.0/16</text>
+                <text x="492" y="772">(subnet)</text>
+                <text x="296" y="788">10.8.0.0/16</text>
+                <text x="176" y="804">10.3.0.0/16</text>
+                <text x="292" y="804">20.0.0.0/8</text>
+                <text x="496" y="804">10.8.0.0/16</text>
+                <text x="32" y="852">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</text>
+                <text x="228" y="852">13c6fe4d93adb6ef794b81dc747e9157734dd37c</text>
+              </g>
+            </svg><a href="#section-5-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-intra-domain-savnet-use-cas" class="selfRef">Intra-domain SAVNET Use Cases</a>
+        </figcaption></figure>
+</div>
+<p id="section-5-3"><a href="#sav_usecase" class="auto internal xref">Figure 5</a> shows a domain AS1 with two areas, namely the backbone area Area0 and non-backbone area Area1. ABR R6 connects Area0 and Area1, and ASBR R9 connects AS1 and AS2. First, let’s consider the scenarios where stub networks of Area1 spoof the source addresses of other networks. We will see how routers in Area1 can use source address verification to identify the spoofed traffic. Assume routers R1-R4 and R6 in Area1 support intra-domain SAVNET, while R5 does not.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4"><strong>Use Case 1: Edge SAV.</strong> Suppose R3 knows its connected subnet's address range is 10.3.0.0/16. R3 can add the prefix 10.3.0.0/16 to the SAV whitelist at the interface connecting this subnet. Then packets originating from the subnet will only be forwarded by R3 if their source addresses belong to 10.3.0.0/16. Packets spoofing the source addresses of other networks will be prevented from entering the network at R3.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5"><strong>Use Case 2: Transit SAV.</strong> Since R5 does not support SAV, three types of spoofed source address packets might enter the network through R5:<a href="#section-5-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-5-6">
+<li id="section-5-6.1">
+          <p id="section-5-6.1.1">Packets from R5 spoofing other network prefixes within the same area (e.g., 10.1.0.0/16). If the rest of Area1's routers learn through R1's SAV message that the legitimate incoming interfaces for 10.1.0.0/16 are the interfaces corresponding to links R1-R2, R1-R3, R2-R4, R2-R5, and R4-R6 (as detailed in <a href="#spt-sec" class="auto internal xref">Section 3.2</a>), then spoofed traffic from R5 entering R2, R3, R4, and R6 through links R5-R3, R5-R2, R5-R4, and R5-R6 will be blocked by these transit routers.<a href="#section-5-6.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-5-6.2">
+          <p id="section-5-6.2.1">Packets from R5 spoofing prefixes of Area0 (e.g., 10.8.0.0/16). Assume R6’s SPT includes links R6-R4, R4-R2, and R2-R1. R6 can send SAV messages with the source prefix 10.8.0.0/16 along these links to R4, R2, and R1. Thus, spoofed traffic from R5 entering R4, R2, and R1 through paths R5-R4, R5-R2, R5-R3-R1 will be blocked.<a href="#section-5-6.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-5-6.3">
+          <p id="section-5-6.3.1">Packets from R5 spoofing prefixes of AS2 (e.g., 20.0.0.0/8). Similar to the second scenario, R6 can send SAV messages with the source prefix 20.0.0.0/8 along links R6-R4, R4-R2, and R2-R1 to R4, R2, and R1. Thus, spoofed traffic from R5 entering R4, R2, and R1 through paths R5-R4, R5-R2, R5-R3-R1 will be blocked.<a href="#section-5-6.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-5-7"><strong>Use Case 3: Area Border SAV.</strong> ABR R6 advertises Area0's routing prefixes to Area1 through Type 3 LSAs, including the prefix 10.8.0.0/16. R6 can establish a SAV blacklist for these prefixes at its interfaces connecting to Area1. If packets received at these interfaces have source addresses that hit the SAV blacklist, such as packets from R5 to R6 spoofing 10.8.0.0/16, they will be blocked by R6.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-5-8">Next, we look at how ASBR R9 identifies spoofed traffic from AS2 spoofing AS1's source addresses when it reaches R9.<a href="#section-5-8" class="pilcrow">¶</a></p>
+<p id="section-5-9"><strong>Use Case 4: AS Border SAV.</strong> R9 can obtain AS1's routing prefixes through Type 1 and Type 3 LSAs and establish a SAV blacklist at its interfaces connecting to AS2. If packets received at these interfaces have source addresses that hit the SAV blacklist, such as packets from R20 to R9 spoofing 10.1.0.0/16, they will be blocked by R9.<a href="#section-5-9" class="pilcrow">¶</a></p>
+<p id="section-5-10">In summary, different routers in the AS can use various SAV methods to perform thorough validation of outbound packets from the AS or inbound packets from the internet.<a href="#section-5-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="automatic-update-considerations">
+<section id="section-6">
+      <h2 id="name-automatic-update-considerat">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-automatic-update-considerat" class="section-name selfRef">Automatic Update Considerations</a>
+      </h2>
+<p id="section-6-1">When network changes occur, routers need to promptly update their SAV rules to ensure the accuracy of source address validation. Propagating SAV messages via OSPF flooding ensures that all routers in the network can timely receive SAV message updates and update their SAV rules correspondingly.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">For SAV messages generated based on the SPT, when a router's source prefix to be protected changes or SPT changes, the router should generate a new SAV message to inform other routers in the network to update their SAV rules. A new SAV rule about prefix p based on this message should replace the existing SAV rule about prefix p that was generated based on an earlier SPT-type SAV message.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">For SAV messages generated based on PBR rules, if a router adds a new PBR rule which redirects traffic with a specified source prefix to a next-hop N, it should send a SAV message about this prefix to N. If a router adds a new PBR rule which redirects traffic without a specified source prefix to a next-hop N, it should send a SAV message about its own prefixes to N, and also forward the SAV messages it received from other routers to N based on this rule. Then N will further forward the received messages based on the DR and DP fields accordingly, allowing other routers in the network to timely learn the new forwarding paths added by PBR.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-4">It is recommended to set a age field for SAV rules built on PBR-type SAV messages. The age refers to the amount of time that has elapsed since the SAV rule was originally generated and gradually increases over time. Periodic sending of SAV messages based on a certain PBR rule refreshes the corresponding SAV rules and reset the age field to 0. If a PBR-type SAV rule is not refreshed before it reaches Max Age, it is considered expired and should be removed from the SAV table.<a href="#section-6-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="incrementalpartial-deployment-considerations">
+<section id="section-7">
+      <h2 id="name-incremental-partial-deploym">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-incremental-partial-deploym" class="section-name selfRef">Incremental/Partial Deployment Considerations</a>
+      </h2>
+<p id="section-7-1">In terms of deployment strategy, it is recommended to deploy Edge SAV and AS Border SAV first to block spoofed traffic at the edges of a domain. If Edge SAV cannot be fully deployed within the domain, Area Border SAV is recommended to be deployed in multi-area scenarios, allowing ABRs to prevent inter-area source address spoofing. Transit SAV is recommended to be deployed in each area to validate spoofed source address packets during their forwarding process. The deployment strategy can be adjusted based on the actual performance and specific needs of each area. Start by deploying in critical areas ensures that the most sensitive or vulnerable parts of the network gain protection early in the deployment process.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">In scenarios where Transit SAV is partially deployed within an area, it is suggested to extend the Router Information (RI) LSA <span>[<a href="#RFC7770" class="cite xref">RFC7770</a>]</span> to exchange information about each router’s support for Transit SAV. Routers that support Transit SAV can proactively advertise SAV messages to neighbors that also support Transit SAV, to protect their own source prefixes from being spoofed. Routers receiving SAVNET messages can establish SAV rules to block packets coming from unauthorized interfaces. The source prefixes can be better protected with more routers within the domain supporting Transit SAV.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">In scenarios where Transit SAV is partially deployed within an area, if routers that do not support Transit SAV have enabled PBR, this may prevent other routers from getting all the valid incoming interfaces for a given source prefix. In such cases, a flexible traffic handling strategy is recommended. Packets coming from unauthorized interfaces are dropped or rate limited only when the traffic is clearly abnormal.<a href="#section-7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-3">
+<section id="section-8">
       <h2 id="name-security-considerations">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-3-1">TODO Security<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">This document does not introduce any new security considerations beyond those inherent in the existing OSPF protocol implementations. The security features already available in OSPF, such as authentication mechanisms, can be leveraged to ensure the secure transmission of SAV messages. Utilizing OSPF’s built-in capabilities for securing routing information ensures that the integrity and authenticity of SAV messages are maintained across the network.<a href="#section-8-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-4">
+<section id="section-9">
       <h2 id="name-iana-considerations">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-4-1">This document has no IANA actions.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<div id="ospfv2">
+<section id="section-9.1">
+        <h3 id="name-ospfv2">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-ospfv2" class="section-name selfRef">OSPFv2</a>
+        </h3>
+<p id="section-9.1-1">Under "OSPFv2 Extended Prefix TLV Sub-TLVs registry" as defined in <span>[<a href="#RFC7684" class="cite xref">RFC7684</a>]</span>, IANA is requested to assign a registry value for OSPFv2 Source Prefix Validation Sub-TLV as follows:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-9.1-2">
+<pre>
++===========+==========================+==================+
+|   Value   |        Description       |     Reference    |
++===========+==========================+==================+
+|   TBD1    | Source Prefix Validation |   This document  |
++-----------+--------------------------+------------------+
+</pre><a href="#section-9.1-2" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
-<div id="sec-normative-references">
-<section id="section-5">
-      <h2 id="name-normative-references">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<div id="ospfv3">
+<section id="section-9.2">
+        <h3 id="name-ospfv3">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-ospfv3" class="section-name selfRef">OSPFv3</a>
+        </h3>
+<p id="section-9.2-1">Under "OSPFv3 Extended-LSA Sub-TLVs registry" as defined in <span>[<a href="#RFC8362" class="cite xref">RFC8362</a>]</span>, IANA is requested to assign a registry value for OSPFv3 Source Prefix Validation Sub-TLV as follows:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-9.2-2">
+<pre>
++===========+==========================+==================+
+|   Value   |        Description       |     Reference    |
++===========+==========================+==================+
+|   TBD2    | Source Prefix Validation |   This document  |
++-----------+--------------------------+------------------+
+</pre><a href="#section-9.2-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<section id="section-10">
+      <h2 id="name-references">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-10.1">
+        <h3 id="name-normative-references">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
+<dt id="intra-domain-arch">[intra-domain-arch]</dt>
+        <dd>
+<span class="refTitle">"Intra-domain Source Address Validation (SAVNET) Architecture"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/draft-li-savnet-intra-domain-architecture/">https://datatracker.ietf.org/doc/draft-li-savnet-intra-domain-architecture/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC2328">[RFC2328]</dt>
+        <dd>
+<span class="refAuthor">Moy, J.</span>, <span class="refTitle">"OSPF Version 2"</span>, <span class="seriesInfo">STD 54</span>, <span class="seriesInfo">RFC 2328</span>, <span class="seriesInfo">DOI 10.17487/RFC2328</span>, <time datetime="1998-04" class="refDate">April 1998</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2328">https://www.rfc-editor.org/rfc/rfc2328</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2827">[RFC2827]</dt>
+        <dd>
+<span class="refAuthor">Ferguson, P.</span> and <span class="refAuthor">D. Senie</span>, <span class="refTitle">"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing"</span>, <span class="seriesInfo">BCP 38</span>, <span class="seriesInfo">RFC 2827</span>, <span class="seriesInfo">DOI 10.17487/RFC2827</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2827">https://www.rfc-editor.org/rfc/rfc2827</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3704">[RFC3704]</dt>
+        <dd>
+<span class="refAuthor">Baker, F.</span> and <span class="refAuthor">P. Savola</span>, <span class="refTitle">"Ingress Filtering for Multihomed Networks"</span>, <span class="seriesInfo">BCP 84</span>, <span class="seriesInfo">RFC 3704</span>, <span class="seriesInfo">DOI 10.17487/RFC3704</span>, <time datetime="2004-03" class="refDate">March 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3704">https://www.rfc-editor.org/rfc/rfc3704</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7684">[RFC7684]</dt>
+        <dd>
+<span class="refAuthor">Psenak, P.</span>, <span class="refAuthor">Gredler, H.</span>, <span class="refAuthor">Shakir, R.</span>, <span class="refAuthor">Henderickx, W.</span>, <span class="refAuthor">Tantsura, J.</span>, and <span class="refAuthor">A. Lindem</span>, <span class="refTitle">"OSPFv2 Prefix/Link Attribute Advertisement"</span>, <span class="seriesInfo">RFC 7684</span>, <span class="seriesInfo">DOI 10.17487/RFC7684</span>, <time datetime="2015-11" class="refDate">November 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7684">https://www.rfc-editor.org/rfc/rfc7684</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-    <dd>
+        <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8362">[RFC8362]</dt>
+      <dd>
+<span class="refAuthor">Lindem, A.</span>, <span class="refAuthor">Roy, A.</span>, <span class="refAuthor">Goethals, D.</span>, <span class="refAuthor">Reddy Vallem, V.</span>, and <span class="refAuthor">F. Baker</span>, <span class="refTitle">"OSPFv3 Link State Advertisement (LSA) Extensibility"</span>, <span class="seriesInfo">RFC 8362</span>, <span class="seriesInfo">DOI 10.17487/RFC8362</span>, <time datetime="2018-04" class="refDate">April 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8362">https://www.rfc-editor.org/rfc/rfc8362</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 </div>
+<div id="sec-informative-references">
+<section id="section-10.2">
+        <h3 id="name-informative-references">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="intra-domain-ps">[intra-domain-ps]</dt>
+        <dd>
+<span class="refTitle">"Source Address Validation in Intra-domain Networks Gap Analysis, Problem Statement, and Requirements"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/draft-ietf-savnet-intra-domain-problem-statement/">https://datatracker.ietf.org/doc/draft-ietf-savnet-intra-domain-problem-statement/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5250">[RFC5250]</dt>
+        <dd>
+<span class="refAuthor">Berger, L.</span>, <span class="refAuthor">Bryskin, I.</span>, <span class="refAuthor">Zinin, A.</span>, and <span class="refAuthor">R. Coltun</span>, <span class="refTitle">"The OSPF Opaque LSA Option"</span>, <span class="seriesInfo">RFC 5250</span>, <span class="seriesInfo">DOI 10.17487/RFC5250</span>, <time datetime="2008-07" class="refDate">July 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5250">https://www.rfc-editor.org/rfc/rfc5250</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7770">[RFC7770]</dt>
+        <dd>
+<span class="refAuthor">Lindem, A., Ed.</span>, <span class="refAuthor">Shen, N.</span>, <span class="refAuthor">Vasseur, JP.</span>, <span class="refAuthor">Aggarwal, R.</span>, and <span class="refAuthor">S. Shaffer</span>, <span class="refTitle">"Extensions to OSPF for Advertising Optional Router Capabilities"</span>, <span class="seriesInfo">RFC 7770</span>, <span class="seriesInfo">DOI 10.17487/RFC7770</span>, <time datetime="2016-02" class="refDate">February 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7770">https://www.rfc-editor.org/rfc/rfc7770</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="sav-table">[sav-table]</dt>
+      <dd>
+<span class="refTitle">"General Source Address Validation Capabilities"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/draft-huang-savnet-sav-table/">https://datatracker.ietf.org/doc/draft-huang-savnet-sav-table/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
 <div id="acknowledgments">
 <section id="appendix-A">
       <h2 id="name-acknowledgments">
@@ -1282,15 +2229,47 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 </div>
 <div id="authors-addresses">
 <section id="appendix-B">
-      <h2 id="name-authors-address">
-<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
-        <div dir="auto" class="left"><span class="fn nameRole">wsxyer</span></div>
-<div dir="auto" class="left"><span class="org">Your Organization Here</span></div>
+        <div dir="auto" class="left"><span class="fn nameRole">Yuanyuan Zhang</span></div>
+<div dir="auto" class="left"><span class="org">Zhongguancun Laboratory</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
 <div class="email">
 <span>Email:</span>
-<a href="mailto:121650125+wsxyer@users.noreply.github.com" class="email">121650125+wsxyer@users.noreply.github.com</a>
+<a href="mailto:zhangyy@zgclab.edu.cn" class="email">zhangyy@zgclab.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Mingwei Xu</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:xmw@cernet.edu.cn" class="email">xmw@cernet.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Dan Li</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:tolidan@tsinghua.edu.cn" class="email">tolidan@tsinghua.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Yuliang Wang</span></div>
+<div dir="auto" class="left"><span class="org">Quan Cheng Laboratory</span></div>
+<div dir="auto" class="left"><span class="locality">Jinan</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:ts-wangyl@qcl.edu.cn" class="email">ts-wangyl@qcl.edu.cn</a>
 </div>
 </address>
 </section>
