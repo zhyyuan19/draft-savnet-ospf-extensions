@@ -150,7 +150,7 @@ For intra-domain networks, source address spoofing primarily occurs in the follo
 ~~~
 {: #sav_usecase title="Intra-domain SAVNET Use Cases"}
 
-{{sav_usecase}} shows a domain AS1 with two areas, namely the backbone area Area0 and non-backbone area Area1. ABR R6 connects Area0 and Area1, and ASBR R9 connects AS1 and AS2. First, let’s consider the scenarios where stub networks of R3 and R5 in Area1 spoof the source addresses of other networks. We will show how routers in Area1 can use source address verification to identify the spoofed traffic. 
+{{sav_usecase}} shows a domain AS1 with two areas, namely the backbone area Area0 and non-backbone area Area1. ABR R6 connects Area0 and Area1, and ASBR R9 connects AS1 and AS2. First, let’s consider the scenarios where stub networks of R3 and R5 in Area1 spoof the source addresses of other networks. We will show how routers in Area1 can use source address verification to identify the spoofed traffic.
 
 **Use Case 1: Edge SAV.** Suppose R3 knows its connected subnet's address range is 10.3.0.0/16. R3 can add the prefix 10.3.0.0/16 to the SAV whitelist at the interface connecting this subnet. Then packets originating from the subnet will only be forwarded by R3 if their source addresses belong to 10.3.0.0/16. Packets spoofing the source addresses of other networks will be prevented from entering the network at R3.
 
