@@ -5,15 +5,15 @@
 SAVNET                                                          Y. Zhang
 Internet-Draft                                   Zhongguancun Laboratory
 Intended status: Informational                                     M. Xu
-Expires: 11 November 2024                                          D. Li
+Expires: 17 November 2024                                          D. Li
                                                      Tsinghua University
                                                                  Y. Wang
                                                    Quan Cheng Laboratory
-                                                             10 May 2024
+                                                             16 May 2024
 
 
- Extensions to OSPF for Intra-domain Source Address Validation (SAVNET)
-       draft-zhang-ospf-extensions-for-intra-domain-savnet-latest
+               Source Address Validation in OSPF Networks
+                   draft-zhang-savnet-sav-ospf-latest
 
 Abstract
 
@@ -31,9 +31,9 @@ About This Document
 
    The latest revision of this draft can be found at
    https://wsxyer.github.io/draft-savnet-ospf-extensions/draft-zhang-
-   ospf-extensions-for-intra-domain-savnet.html.  Status information for
-   this document may be found at https://datatracker.ietf.org/doc/draft-
-   zhang-ospf-extensions-for-intra-domain-savnet/.
+   savnet-sav-ospf.html.  Status information for this document may be
+   found at https://datatracker.ietf.org/doc/draft-zhang-savnet-sav-
+   ospf/.
 
    Discussion of this document takes place on the SAVNET Working Group
    mailing list (mailto:savnet@ietf.org), which is archived at
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 November 2024.
+   This Internet-Draft will expire on 17 November 2024.
 
 Copyright Notice
 
@@ -79,16 +79,17 @@ Table of Contents
    1.  Introduction
      1.1.  Requirements Language
    2.  Terminology
-   3.  Solution
+   3.  Source Address Validation in OSPF Networks
      3.1.  Overview
-     3.2.  SAV Message Propagation based on SPT
-     3.3.  SAV Message Propagation considering Policy-based Routing
-       3.3.1.  SAV Message Generation
-       3.3.2.  SAV Message Forwarding
-   4.  Protocol Extension
-     4.1.  Extensions to OSPFv2 for SAV Message Propagation
-     4.2.  Extensions to OSPFv3 for SAV Message Propagation
-   5.  Use Cases
+     3.2.  Use Cases
+   4.  Solution to Transit SAV
+     4.1.  SAV Message Propagation based on SPT
+     4.2.  SAV Message Propagation considering Policy-based Routing
+       4.2.1.  SAV Message Generation
+       4.2.2.  SAV Message Forwarding
+   5.  Protocol Extension
+     5.1.  Extensions to OSPFv2 for SAV Message Propagation
+     5.2.  Extensions to OSPFv3 for SAV Message Propagation
    6.  Automatic Update Considerations
    7.  Incremental/Partial Deployment Considerations
    8.  Security Considerations
@@ -122,34 +123,28 @@ Table of Contents
    dynamic network environments.
 
    To address these shortcomings, the Intra-domain Source Address
-   Validation (SAVNET) Architecture[intra-domain-arch] proposes a novel
-   framework that facilitates the exchange of SAV-specific information
-   among routers within a domain.  This architecture is designed to
-   bridge the gap left by existing solutions, enabling the automatic
-   creation of sav rules and enhancing the accuracy of source address
-   validation.  By leveraging timely and dedicated information
-   specialized for SAV, this approach aims to reduce the incidence of
-   both false positives and negatives associated with source address
-   validation.
+   Validation (SAVNET) Architecture[intra-domain-arch] proposes a
+   framework that use both local routing information and SAV-specific
+   information exchanged among routers to achieve accurate SAV in an
+   intra-domain network by an automatic way.
 
-   This document follows the Intra-domain SAVNET architecture to propose
-   a specific implementation that extends the OSPF protocol to enable
-   the exchange of SAV-specific information within the domain.  The
-   proposed solution equips routers with the capability to recognize all
-   the legitimate ingress interfaces a source prefix might reach along
-   its actual forwarding paths—paths not only defined by routing
-   protocols but also specified by network administrators based on
-   policies.  Such an approach enables routers to use the accurate
-   information they possess to prevent both the erroneous blocking of
-   legitimate traffic and the spread of spoofed traffic within a network
-   domain.
+   This document follows the Intra-domain SAVNET architecture and delves
+   into the SAV mechanisms that can be implemented in OSPF networks to
+   address various intra-domain source address spoofing scenarios.
+   These mechanisms leverage either routing information from the LSDB or
+   SAV-specific information from other routers to achieve accurate and
+   automated SAV.  A new Source Prefix Validation Sub-TLV is defined to
+   enable the exchange of SAV-specific information among OSPF routers.
+   It equips routers with the capability to recognize all the legitimate
+   ingress interfaces a source prefix might reach along its actual
+   forwarding paths—paths not only defined by routing protocols but also
+   specified by network administrators based on policies.  Routers can
+   use the accurate information they possess to prevent both the
+   erroneous blocking of legitimate traffic and the spread of spoofed
+   traffic within a network domain.
 
-   The scheme proposed herein is applicable to both single-area and
-   multi-area scenarios within a domain.  In multi-area scenarios, the
-   SAV-specific information generated by routers is propagated only
-   within their respective areas, thus reducing communication overhead.
-   Implementing or partially implementing this scheme within a domain
-   will help achieve the following objectives:
+   OSPF networks can fully or partially implement these SAV mechanisms
+   as needed to achieve the following objectives:
 
    *  Outbound traffic validation: prevent packets with spoofed source
       addresses generated by the stub networks from entering or moving
@@ -193,7 +188,7 @@ Table of Contents
       The validation results that the packets with spoofed source
       addresses are permitted improperly due to inaccurate SAV rules.
 
-3.  Solution
+3.  Source Address Validation in OSPF Networks
 
 3.1.  Overview
 
@@ -222,12 +217,14 @@ Table of Contents
 
       Ensuring that all edge routers support Edge SAV might be
       challenging in a network environment composed of multi-vendor
-      devices, due to differences in versions and capabilities.  If not
-      all edge routers can achieve accurate Edge SAV, packets with
-      spoofed source addresses from stub networks might still appear
-      within the domain.  Under such circumstances, transit routers,
-      responsible for forwarding packets, can perform source address
-      validation during packet transit, further ensuring the
+      devices managed by different operations teams, due to differences
+      in resource investment and technical capalilities.  Full
+      deployment of Edge SAV could be a long-term process in such a
+      situation.  If not all edge routers can achieve accurate Edge SAV,
+      packets with spoofed source addresses from stub networks might
+      still appear within the domain.  Under such circumstances, transit
+      routers, responsible for forwarding packets, can perform source
+      address validation during packet transit, further ensuring the
       authenticity of traffic forwarded in the domain.
 
    *  *Area Border Source Address Validation (Area Border SAV)*
@@ -267,27 +264,141 @@ Table of Contents
    limiting.  If the source address of a packet does not match any
    recorded source prefix, the packet is considered valid by default.
 
-   In OSPF networks, packets are typically forwarded along the paths
-   specified by the Shortest Path Tree (SPT).  However, if a router has
-   enabled Policy-Based Routing (PBR), the packets will be
-   preferentially forwarded to the next hop as designated by the PBR
-   rules.  Transit routers must be aware of all valid incoming
+3.2.  Use Cases
+
+   For intra-domain networks, source address spoofing primarily occurs
+   in the following scenarios: Firstly, a stub network within the domain
+   might spoof the source addresses of other networks, which could be
+   those within the same area, other areas within the domain, or even
+   other ASes.  Secondly, packets from other ASes spoofing the source
+   addresses of a domain might enter this domain.  This section uses
+   Figure 1 as an example to comprehensively demonstrate the typical
+   scenarios of intra-domain source address spoofing and explain how to
+   effectively implement intra-domain SAV using the approaches proposed
+   in Section 3.1.
+
++----------------------------------------------------------------------------+  +--------------+
+|                             AS1(10.0.0.0/8)                                |  |      AS2     |
+|                                                                            |  | (20.0.0.0/8) |
+| +----------------------------------------------+ +-----------------------+ |  |              |
+| | Area1                                        | |  Area0                | |  |              |
+| |                    +----+        +----+      | |       +----+          | |  |              |
+| |              +-----+ R2 +--------+ R4 +----+ | | +-----+ R7 +-----+    | |  |              |
+| |              |     +----+\      /+--+-+    | | | |     +----+     |    | |  |              |
+| |              |            \    /           | | | |                |    | |  |              |
+| |              |             \  /            | | | |                |    | |  |              |
+| |           +--+-+            \/            ++-+-+-++            +--+--+ | |  |   +------+   |
+| |           | R1 |            /\            |  R6   |            |  R9 +----------+  R20 |   |
+| |           +--+-+           /  \           ++-+-+-++            +--+--+ | |  |   +---+--+   |
+| |            / |            /    \           | | | |                |    | |  |       ^      |
+| |     +----+/  |     +----+/      \+--+-+    | | | |     +----+     |    | |  |       |      |
+| |    (subnet)  +-----+ R3 +--------+ R5 +----+ | | +-----+ R8 +-----+    | |  |       +      |
+| |     +----+         +--+-+        +--+-+      | |       +-+--+          | |  |    spoofed   |
+| | 10.1.0.0/16         / ^             ^        | |         |             | |  |  10.1.0.0/16 |
+| |              +----+/  |             |        | |       +-+--+          | |  |              |
+| |             (subnet)  +--+spoofed+--+        | |      (subnet)         | |  |              |
+| |              +----+       10.1.0.0/16        | |       +----+          | |  |              |
+| |             0.3.0.0/16    10.8.0.0/16        | |     10.8.0.0/16       | |  |              |
+| |                           20.0.0.0/8         | |                       | |  |              |
+| +----------------------------------------------+ +-----------------------+ |  |              |
++----------------------------------------------------------------------------+  +--------------+
+
+               Figure 1: Intra-domain SAVNET Use Cases
+
+   Figure 1 shows a domain AS1 with two areas, namely the backbone area
+   Area0 and non-backbone area Area1.  ABR R6 connects Area0 and Area1,
+   and ASBR R9 connects AS1 and AS2.  First, let’s consider the
+   scenarios where stub networks of R3 and R5 in Area1 spoof the source
+   addresses of other networks.  We will show how routers in Area1 can
+   use source address verification to identify the spoofed traffic.
+
+   *Use Case 1: Edge SAV.* Suppose R3 knows its connected subnet's
+   address range is 10.3.0.0/16.  R3 can add the prefix 10.3.0.0/16 to
+   the SAV whitelist at the interface connecting this subnet.  Then
+   packets originating from the subnet will only be forwarded by R3 if
+   their source addresses belong to 10.3.0.0/16.  Packets spoofing the
+   source addresses of other networks will be prevented from entering
+   the network at R3.
+
+   *Use Case 2: Transit SAV.* Assume R5 does not support SAV due to
+   hardware/software capability limitations or performance
+   considerations.  Routers R1-R4 and R6 in Area1 can check whether the
+   packets form R5 spoof the source address of another network by
+   learning the valid incoming interfaces for packets from that network.
+   Specifically, three types of spoofed source address packets might
+   enter the network through R5:
+
+   1.  Packets from R5 spoofing other network prefixes within the same
+       area (e.g., 10.1.0.0/16 of R1).  If R2, R3, R4 and R6 learn that
+       the legitimate incoming interfaces for 10.1.0.0/16 are the
+       interfaces corresponding to links R1-R2, R1-R3, R2-R4 and R4-R6
+       separately, then spoofed traffic from R5 entering R2, R3, and R6
+       through links R5-R3, R5-R2, and R5-R6 can be blocked by these
+       transit routers.
+
+   2.  Packets from R5 spoofing prefixes of Area0 (e.g., 10.8.0.0/16 of
+       R8).  Assume R4, R2 and R1 learn that the legitimate incoming
+       interfaces for 10.8.0.0/16 are the interfaces corresponding to
+       links R6-R4, R4-R2 and R2-R1 separately.  Then spoofed traffic
+       from R5 entering R4, R2 and R1 through paths R5-R3-R4, R5-R2, and
+       R5-R3-R1 can be blocked.
+
+   3.  Packets from R5 spoofing prefixes of AS2 (e.g., 20.0.0.0/8).
+       Similar to the second scenario, if R4, R2 and R1 learn that the
+       legitimate incoming interfaces for 20.0.0.0/8 are the interfaces
+       corresponding to links R6-R4, R4-R2 and R2-R1 separately, then
+       spoofed traffic from R5 entering R4, R2, and R1 through paths
+       R5-R3-R4, R5-R2, R5-R3-R1 can be blocked.
+
+   *Use Case 3: Area Border SAV.* ABR R6 advertises Area0's routing
+   prefixes to Area1 through Type 3 LSAs, including the prefix
+   10.8.0.0/16.  R6 can establish a SAV blacklist for these prefixes at
+   its interfaces connecting to Area1.  If packets received at these
+   interfaces have source addresses that hit the SAV blacklist, such as
+   packets from R5 to R6 spoofing 10.8.0.0/16, they can be blocked by
+   R6.
+
+   Next, we look at how ASBR R9 identifies spoofed traffic from AS2
+   spoofing AS1's source addresses when it reaches R9.
+
+   *Use Case 4: AS Border SAV.* R9 can obtain AS1's routing prefixes
+   through Type 1 and Type 3 LSAs and establish a SAV blacklist at its
+   interfaces connecting to AS2.  If packets received at these
+   interfaces have source addresses that hit the SAV blacklist, such as
+   packets from R20 to R9 spoofing 10.1.0.0/16, they can be blocked by
+   R9.
+
+   In summary, an intra-domain network can customize its SAV solutions
+   based on specific network environments and security requirements.  It
+   can flexibly activate various SAV modes on different routers, such as
+   Edge SAV only, a combination of Edge SAV, ABR SAV, and ASBR SAV, or
+   Edge SAV and Transit SAV.  This ensures that the solution is not only
+   effective but also tailored to the actual circumstances of the
+   network.
+
+4.  Solution to Transit SAV
+
+   For Transit SAV, a router must be aware of all the valid incoming
    interfaces for a source prefix to avoid improper blocking of packets
-   with legitimate source addresses.  An effective approach is for the
-   router owning that source prefix to proactively send SAV messages to
-   these transit routers.  The messages should inform the routers about
-   which interfaces packets matching that source prefix will reach along
-   the actual forwarding paths, including those determined by the
-   routing protocol and those specified by PBR.  To accomplish this,
-   routers can generate a SAV message for a protected source prefix,
-   specifying the neighboring router to receive the message and the
-   destination routers to which the message will be ultimately
-   advertised.  The SAV message propagates along the actual forwarding
-   path of the source prefix.  Routers receiving a SAV message through
-   an interface recognize that interface as valid for the source prefix
-   conveyed in the message.  Based on the received SAV messages, routers
-   can establish a prefix-based interface allowlist (see [sav-table])
-   for data-plane SAV filtering.
+   with legitimate source addresses.  In OSPF networks, packets are
+   typically forwarded along the paths specified by the Shortest Path
+   Tree (SPT).  However, if a router has enabled Policy-Based Routing
+   (PBR), the packets will be preferentially forwarded to the next hop
+   as designated by the PBR rules.  Thus, an effective way to implement
+   Transit SAV is for the router owning that source prefix to
+   proactively send SAV messages to other routers.  The messages should
+   inform the routers about which interfaces packets matching that
+   source prefix will reach along the actual forwarding paths, including
+   those determined by the routing protocol and those specified by PBR.
+   To accomplish this, a router can generate a SAV message for a
+   protected source prefix, specifying the neighboring router to receive
+   the message and the destination routers to which the message will be
+   ultimately advertised.  The SAV message propagates along the actual
+   forwarding path of the source prefix.  Routers receiving a SAV
+   message through an interface recognize that interface as valid for
+   the source prefix conveyed in the message.  Based on the received SAV
+   messages, routers can establish a prefix-based interface allowlist
+   (see [sav-table]) for data-plane SAV filtering.
 
    A SAV message should at least include the following fields:
 
@@ -315,19 +426,24 @@ Table of Contents
       The destination prefix to which the message is ultimately
       advertised.
 
-   Section 3.2 and Section 3.3 respectively elaborate on the generation
+   Section 4.1 and Section 4.2 respectively elaborate on the generation
    and propagation of SAV messages in scenarios only involving
    conventional routing and those with PBR enabled.  The format of each
    field in a SAV message is specific to the OSPF version used, which
-   will be explained in Section 4.
+   will be explained in Section 5.
 
-3.2.  SAV Message Propagation based on SPT
+   Transit SAV is applicable to both single-area and multi-area
+   scenarios within a domain.  In multi-area scenarios, the SAV messages
+   generated by routers are propagated only within their respective
+   areas.
+
+4.1.  SAV Message Propagation based on SPT
 
    This section describes how intra-domain routers generate and
    propagate SAV messages based on the local Shortest Path Tree (SPT)
-   and establish SAV rules.  Figure 1 shows an intra-domain network
+   and establish SAV rules.  Figure 2 shows an intra-domain network
    running the OSPF protocol.  The SPT of Router R1 is shown in
-   Figure 2.  Packets originating from R1, with a source address within
+   Figure 3.  Packets originating from R1, with a source address within
    the subnet 10.1.0.0/16, are forwarded along this SPT path.  The SAV
    message generated by R1 should be propagated along the SPT to all
    leaf node routers, carrying the prefix 10.1.0.0/16.  All routers
@@ -381,7 +497,7 @@ Table of Contents
    10.1.0.0/16         +----+        +----+
                  int.3.1        int.5.1
 
-               Figure 1: An example of intra-domain network.
+               Figure 2: An example of intra-domain network.
 
              R2 SAV rules                  R4 SAV rules
              <10.1.0.0/16,int.2.1>         <10.1.0.0/16,int.4.1>
@@ -402,7 +518,7 @@ Table of Contents
 
    * the interface that receives SAV message of 10.1.0.0/16 from R1
 
-           Figure 2: SAV message propagation along the SPT of R1.
+           Figure 3: SAV message propagation along the SPT of R1.
 
    SAV messages are propagated within an area.  SAV messages generated
    by different routers carry different source prefix information based
@@ -430,7 +546,7 @@ Table of Contents
    LSAs advertised by this ABR or prefixes included in the AS-external-
    LSAs advertised by this ASBR as source prefixes to be validated.
 
-3.3.  SAV Message Propagation considering Policy-based Routing
+4.2.  SAV Message Propagation considering Policy-based Routing
 
    Policy-based routing (PBR) is a widely supported feature on modern
    routers.  It enables network administrators to make routing decisions
@@ -451,7 +567,7 @@ Table of Contents
    routing protocols and PBR are considered legitimate entry points,
    thereby minimizing the risk of improper blocking of valid traffic.
 
-   Take Figure 1 as an example.  Assume Router R1 has a local PBR rule
+   Take Figure 2 as an example.  Assume Router R1 has a local PBR rule
    defined as <10.1.1.0/24, 10.5.0.0/16, R3>.  This rule redirects
    traffic from the source IP addresses within 10.1.1.0/24 heading
    towards the stub network connected to R5, to go via R3 instead.  R1
@@ -468,7 +584,7 @@ Table of Contents
    are recognized as valid incoming interfaces for the source prefixes
    of R1.
 
-3.3.1.  SAV Message Generation
+4.2.1.  SAV Message Generation
 
    When a router, such as Router R1, is configured with PBR rules that
    direct specific types of traffic to a neighbor (e.g., R2), it is
@@ -516,9 +632,9 @@ Table of Contents
 
       For cases where DR and DP are not specifically defined, nexthop R2
       determines the endpoints of the SAV message propagation based on
-      local routing policies (see Section 3.3.2).
+      local routing policies (see Section 4.2.2).
 
-3.3.2.  SAV Message Forwarding
+4.2.2.  SAV Message Forwarding
 
    When Router R2, configured with PBR rules, receives a SAV message
    from Router R1, it must forward this message along both the SPT paths
@@ -552,7 +668,7 @@ Table of Contents
 
       -  *Case 1:* If the received message type is 'S':
 
-         1.  Forward the message based on local SPT(see Section 3.2).
+         1.  Forward the message based on local SPT(see Section 4.1).
 
          2.  If there is a local PBR rule <*, dstIP, other, nexthop> and
              dstIP belongs to the nodes along the SPT path to DR,
@@ -566,7 +682,7 @@ Table of Contents
 
       -  *Case 2:* If the received message type is 'P':
 
-         1.  Forward the message based on local SPT(see Section 3.2).
+         1.  Forward the message based on local SPT(see Section 4.1).
 
          2.  If there is a local PBR rule <*, dstIP, other, nexthop> and
              dstIP belongs to DR, forward the message to nexthop,
@@ -604,9 +720,9 @@ Table of Contents
    and SP fields and are directed to the same NR can be consolidated
    before being sent.
 
-4.  Protocol Extension
+5.  Protocol Extension
 
-4.1.  Extensions to OSPFv2 for SAV Message Propagation
+5.1.  Extensions to OSPFv2 for SAV Message Propagation
 
    This document proposes extensions to OSPFv2 to support the
    dissemination of SAV messages via the OSPF protocol.  The extension
@@ -650,7 +766,7 @@ Table of Contents
     |  DP n Length  |      Destination Prefix (DP) n (variable)     |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-             Figure 3: OSPFv2 Source Prefix Validation Sub-TLV
+             Figure 4: OSPFv2 Source Prefix Validation Sub-TLV
 
    Type
       The type of the Sub-TLV.  Value TBD.
@@ -696,7 +812,7 @@ Table of Contents
    Routers that receive this TLV process only the Sub-TLV where the NR
    field matches their own Router ID and ignore others.
 
-4.2.  Extensions to OSPFv3 for SAV Message Propagation
+5.2.  Extensions to OSPFv3 for SAV Message Propagation
 
    In networks utilizing the OSPFv3 protocol, SAV messages are
    advertised through OSPFv3 Extended LSAs, including E-Intra-Area-
@@ -736,7 +852,7 @@ Table of Contents
     |  DP n Length  |      Destination Prefix (DP) n (variable)     |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-             Figure 4: OSPFv3 Source Prefix Validation Sub-TLV
+             Figure 5: OSPFv3 Source Prefix Validation Sub-TLV
 
    Type
       The type of the Sub-TLV.  Value TBD.
@@ -782,110 +898,6 @@ Table of Contents
    each specifying only one NR.  Routers receiving the TLV only process
    the Sub-TLV where the NR field matches their own Router ID and ignore
    others.
-
-5.  Use Cases
-
-   For intra-domain networks, source address spoofing primarily occurs
-   in the following scenarios: Firstly, a stub network within the domain
-   might spoof the source addresses of other networks, which could be
-   those within the same area, other areas within the domain, or even
-   other ASes.  Secondly, packets from other ASes spoofing the source
-   addresses of a domain might enter this domain.  This section uses
-   Figure 5 as an example to comprehensively demonstrate the typical
-   scenarios of intra-domain source address spoofing and explain how to
-   effectively implement intra-domain SAV using the approaches proposed
-   in this document.
-
-+----------------------------------------------------------------------------+  +--------------+
-|                             AS1(10.0.0.0/8)                                |  |      AS2     |
-|                                                                            |  | (20.0.0.0/8) |
-| +----------------------------------------------+ +-----------------------+ |  |              |
-| | Area1                                        | |  Area0                | |  |              |
-| |                    +----+        +----+      | |       +----+          | |  |              |
-| |              +-----+ R2 +--------+ R4 +----+ | | +-----+ R7 +-----+    | |  |              |
-| |              |     +----+\      /+--+-+    | | | |     +----+     |    | |  |              |
-| |              |            \    /           | | | |                |    | |  |              |
-| |              |             \  /            | | | |                |    | |  |              |
-| |           +--+-+            \/            ++-+-+-++            +--+--+ | |  |   +------+   |
-| |           | R1 |            /\            |  R6   |            |  R9 +----------+  R20 |   |
-| |           +--+-+           /  \           ++-+-+-++            +--+--+ | |  |   +---+--+   |
-| |            / |            /    \           | | | |                |    | |  |       ^      |
-| |     +----+/  |     +----+/      \+--+-+    | | | |     +----+     |    | |  |       |      |
-| |    (subnet)  +-----+ R3 +--------+ R5 +----+ | | +-----+ R8 +-----+    | |  |       +      |
-| |     +----+         +--+-+        +--+-+      | |       +-+--+          | |  |    spoofed   |
-| | 10.1.0.0/16         / ^             ^        | |         |             | |  |  10.1.0.0/16 |
-| |              +----+/  |             |        | |       +-+--+          | |  |              |
-| |             (subnet)  +--+spoofed+--+        | |      (subnet)         | |  |              |
-| |              +----+       10.1.0.0/16        | |       +----+          | |  |              |
-| |             0.3.0.0/16    10.8.0.0/16        | |     10.8.0.0/16       | |  |              |
-| |                           20.0.0.0/8         | |                       | |  |              |
-| +----------------------------------------------+ +-----------------------+ |  |              |
-+----------------------------------------------------------------------------+  +--------------+
-
-               Figure 5: Intra-domain SAVNET Use Cases
-
-   Figure 5 shows a domain AS1 with two areas, namely the backbone area
-   Area0 and non-backbone area Area1.  ABR R6 connects Area0 and Area1,
-   and ASBR R9 connects AS1 and AS2.  First, let’s consider the
-   scenarios where stub networks of Area1 spoof the source addresses of
-   other networks.  We will see how routers in Area1 can use source
-   address verification to identify the spoofed traffic.  Assume routers
-   R1-R4 and R6 in Area1 support intra-domain SAVNET, while R5 does not.
-
-   *Use Case 1: Edge SAV.* Suppose R3 knows its connected subnet's
-   address range is 10.3.0.0/16.  R3 can add the prefix 10.3.0.0/16 to
-   the SAV whitelist at the interface connecting this subnet.  Then
-   packets originating from the subnet will only be forwarded by R3 if
-   their source addresses belong to 10.3.0.0/16.  Packets spoofing the
-   source addresses of other networks will be prevented from entering
-   the network at R3.
-
-   *Use Case 2: Transit SAV.* Since R5 does not support SAV, three types
-   of spoofed source address packets might enter the network through R5:
-
-   1.  Packets from R5 spoofing other network prefixes within the same
-       area (e.g., 10.1.0.0/16).  If the rest of Area1's routers learn
-       through R1's SAV message that the legitimate incoming interfaces
-       for 10.1.0.0/16 are the interfaces corresponding to links R1-R2,
-       R1-R3, R2-R4, R2-R5, and R4-R6 (as detailed in Section 3.2), then
-       spoofed traffic from R5 entering R2, R3, R4, and R6 through links
-       R5-R3, R5-R2, R5-R4, and R5-R6 will be blocked by these transit
-       routers.
-
-   2.  Packets from R5 spoofing prefixes of Area0 (e.g., 10.8.0.0/16).
-       Assume R6’s SPT includes links R6-R4, R4-R2, and R2-R1.  R6 can
-       send SAV messages with the source prefix 10.8.0.0/16 along these
-       links to R4, R2, and R1.  Thus, spoofed traffic from R5 entering
-       R4, R2, and R1 through paths R5-R4, R5-R2, R5-R3-R1 will be
-       blocked.
-
-   3.  Packets from R5 spoofing prefixes of AS2 (e.g., 20.0.0.0/8).
-       Similar to the second scenario, R6 can send SAV messages with the
-       source prefix 20.0.0.0/8 along links R6-R4, R4-R2, and R2-R1 to
-       R4, R2, and R1.  Thus, spoofed traffic from R5 entering R4, R2,
-       and R1 through paths R5-R4, R5-R2, R5-R3-R1 will be blocked.
-
-   *Use Case 3: Area Border SAV.* ABR R6 advertises Area0's routing
-   prefixes to Area1 through Type 3 LSAs, including the prefix
-   10.8.0.0/16.  R6 can establish a SAV blacklist for these prefixes at
-   its interfaces connecting to Area1.  If packets received at these
-   interfaces have source addresses that hit the SAV blacklist, such as
-   packets from R5 to R6 spoofing 10.8.0.0/16, they will be blocked by
-   R6.
-
-   Next, we look at how ASBR R9 identifies spoofed traffic from AS2
-   spoofing AS1's source addresses when it reaches R9.
-
-   *Use Case 4: AS Border SAV.* R9 can obtain AS1's routing prefixes
-   through Type 1 and Type 3 LSAs and establish a SAV blacklist at its
-   interfaces connecting to AS2.  If packets received at these
-   interfaces have source addresses that hit the SAV blacklist, such as
-   packets from R20 to R9 spoofing 10.1.0.0/16, they will be blocked by
-   R9.
-
-   In summary, different routers in the AS can use various SAV methods
-   to perform thorough validation of outbound packets from the AS or
-   inbound packets from the internet.
 
 6.  Automatic Update Considerations
 
