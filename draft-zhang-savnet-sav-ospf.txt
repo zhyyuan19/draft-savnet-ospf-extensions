@@ -5,11 +5,11 @@
 SAVNET                                                          Y. Zhang
 Internet-Draft                                   Zhongguancun Laboratory
 Intended status: Informational                                     M. Xu
-Expires: 17 November 2024                                          D. Li
+Expires: 18 November 2024                                          D. Li
                                                      Tsinghua University
                                                                  Y. Wang
                                                    Quan Cheng Laboratory
-                                                             16 May 2024
+                                                             17 May 2024
 
 
                Source Address Validation in OSPF Networks
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 November 2024.
+   This Internet-Draft will expire on 18 November 2024.
 
 Copyright Notice
 
@@ -298,7 +298,7 @@ Table of Contents
 | |              +----+/  |             |        | |       +-+--+          | |  |              |
 | |             (subnet)  +--+spoofed+--+        | |      (subnet)         | |  |              |
 | |              +----+       10.1.0.0/16        | |       +----+          | |  |              |
-| |             0.3.0.0/16    10.8.0.0/16        | |     10.8.0.0/16       | |  |              |
+| |            10.3.0.0/16    10.8.0.0/16        | |     10.8.0.0/16       | |  |              |
 | |                           20.0.0.0/8         | |                       | |  |              |
 | +----------------------------------------------+ +-----------------------+ |  |              |
 +----------------------------------------------------------------------------+  +--------------+
@@ -323,7 +323,7 @@ Table of Contents
    *Use Case 2: Transit SAV.* Assume R5 does not support SAV due to
    hardware/software capability limitations or performance
    considerations.  Routers R1-R4 and R6 in Area1 can check whether the
-   packets form R5 spoof the source address of another network by
+   packets from R5 spoof the source address of another network by
    learning the valid incoming interfaces for packets from that network.
    Specifically, three types of spoofed source address packets might
    enter the network through R5:
@@ -371,10 +371,10 @@ Table of Contents
    In summary, an intra-domain network can customize its SAV solutions
    based on specific network environments and security requirements.  It
    can flexibly activate various SAV modes on different routers, such as
-   Edge SAV only, a combination of Edge SAV, ABR SAV, and ASBR SAV, or
-   Edge SAV and Transit SAV.  This ensures that the solution is not only
-   effective but also tailored to the actual circumstances of the
-   network.
+   Edge SAV only, a combination of Edge SAV, Area Border SAV, and AS
+   Border SAV, or Edge SAV and Transit SAV.  This ensures that the
+   solution is not only effective but also tailored to the actual
+   circumstances of the network.
 
 4.  Solution to Transit SAV
 
@@ -902,10 +902,12 @@ Table of Contents
 6.  Automatic Update Considerations
 
    When network changes occur, routers need to promptly update their SAV
-   rules to ensure the accuracy of source address validation.
-   Propagating SAV messages via OSPF flooding ensures that all routers
-   in the network can timely receive SAV message updates and update
-   their SAV rules correspondingly.
+   rules to ensure the accuracy of source address validation.  For Edge
+   SAV, Area Border SAV, and AS Border SAV, the SAV rules derived from
+   the LSDB can be updated almost in real-time as the LSDB is refreshed.
+   For Transit SAV, propagating SAV messages via OSPF flooding ensures
+   that all routers in the network can timely receive SAV message
+   updates and refresh their SAV rules correspondingly.
 
    For SAV messages generated based on the SPT, when a router's source
    prefix to be protected changes or SPT changes, the router should
