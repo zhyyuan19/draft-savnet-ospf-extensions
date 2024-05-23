@@ -5,11 +5,13 @@
 SAVNET                                                          Y. Zhang
 Internet-Draft                                   Zhongguancun Laboratory
 Intended status: Informational                                     M. Xu
-Expires: 18 November 2024                                          D. Li
+Expires: 24 November 2024                                          D. Li
                                                      Tsinghua University
                                                                  Y. Wang
                                                    Quan Cheng Laboratory
-                                                             17 May 2024
+                                                                  L. Qin
+                                                     Tsinghua University
+                                                             23 May 2024
 
 
                Source Address Validation in OSPF Networks
@@ -58,7 +60,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 November 2024.
+   This Internet-Draft will expire on 24 November 2024.
 
 Copyright Notice
 
@@ -927,7 +929,7 @@ Table of Contents
    accordingly, allowing other routers in the network to timely learn
    the new forwarding paths added by PBR.
 
-   It is recommended to set a age field for SAV rules built on PBR-type
+   It is recommended to set an age field for SAV rules built on PBR-type
    SAV messages.  The age refers to the amount of time that has elapsed
    since the SAV rule was originally generated and gradually increases
    over time.  Periodic sending of SAV messages based on a certain PBR
@@ -1099,3 +1101,10 @@ Authors' Addresses
    Jinan
    China
    Email: ts-wangyl@qcl.edu.cn
+
+
+   Lancheng Qin
+   Tsinghua University
+   Beijing
+   China
+   Email: qlc19@mails.tsinghua.edu.cn
