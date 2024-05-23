@@ -47,6 +47,12 @@ author:
   city: Jinan
   country: China # use TLD (except UK) or country name
   email: ts-wangyl@qcl.edu.cn
+- ins: L. Qin
+  name: Lancheng Qin
+  org: Tsinghua University
+  city: Beijing
+  country: China # use TLD (except UK) or country name
+  email: qlc19@mails.tsinghua.edu.cn
 
 normative:
   intra-domain-arch:
@@ -454,7 +460,7 @@ For SAV messages generated based on the SPT, when a router's source prefix to be
 
 For SAV messages generated based on PBR rules, if a router adds a new PBR rule which redirects traffic with a specified source prefix to a next-hop N, it should send a SAV message about this prefix to N. If a router adds a new PBR rule which redirects traffic without a specified source prefix to a next-hop N, it should send a SAV message about its own prefixes to N, and also forward the SAV messages it received from other routers to N based on this rule. Then N will further forward the received messages based on the DR and DP fields accordingly, allowing other routers in the network to timely learn the new forwarding paths added by PBR.
 
-It is recommended to set a age field for SAV rules built on PBR-type SAV messages. The age refers to the amount of time that has elapsed since the SAV rule was originally generated and gradually increases over time. Periodic sending of SAV messages based on a certain PBR rule refreshes the corresponding SAV rules and reset the age field to 0. If a PBR-type SAV rule is not refreshed before it reaches Max Age, it is considered expired and should be removed from the SAV table.
+It is recommended to set an age field for SAV rules built on PBR-type SAV messages. The age refers to the amount of time that has elapsed since the SAV rule was originally generated and gradually increases over time. Periodic sending of SAV messages based on a certain PBR rule refreshes the corresponding SAV rules and reset the age field to 0. If a PBR-type SAV rule is not refreshed before it reaches Max Age, it is considered expired and should be removed from the SAV table.
 
 # Incremental/Partial Deployment Considerations
 In terms of deployment strategy, it is recommended to deploy Edge SAV and AS Border SAV first to block spoofed traffic at the edges of a domain. If Edge SAV cannot be fully deployed within the domain, Area Border SAV is recommended to be deployed in multi-area scenarios, allowing ABRs to prevent inter-area source address spoofing. Transit SAV is recommended to be deployed in each area to validate spoofed source address packets during their forwarding process. The deployment strategy can be adjusted based on the actual performance and specific needs of each area. Start by deploying in critical areas ensures that the most sensitive or vulnerable parts of the network gain protection early in the deployment process.
